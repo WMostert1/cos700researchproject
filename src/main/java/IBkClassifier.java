@@ -15,6 +15,6 @@ public class IBkClassifier implements IClassify {
         ibk.buildClassifier(training);
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(ibk, testing);
-        return eval.pctCorrect();
+        return eval.kappa();
     }
 }

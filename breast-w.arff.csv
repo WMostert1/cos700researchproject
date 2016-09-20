@@ -1,0 +1,30 @@
+Number of Attributes for Data Set: ,10
+Number of Instances in Data Set: ,699
+Number of Classes in Data Set: ,2
+Sample size: ,3000
+
+
+Count per Level
+Level,0 f(-1.0 -> -0.8),0
+Level,1 f(-0.8 -> -0.6),0
+Level,2 f(-0.6 -> -0.4),0
+Level,3 f(-0.4 -> -0.2),0
+Level,4 f(-0.2 -> 0.0),0
+Level,5 f(0.0 -> 0.2),2
+Level,6 f(0.2 -> 0.4),0
+Level,7 f(0.4 -> 0.6),12
+Level,8 f(0.6 -> 0.8),49
+Level,9 f(0.8 -> 1.0),2937
+HDIL
+
+
+Level ,0 f(-1.0 -> -0.8),0.0
+Level ,1 f(-0.8 -> -0.6),0.0
+Level ,2 f(-0.6 -> -0.4),0.0
+Level ,3 f(-0.4 -> -0.2),0.0
+Level ,4 f(-0.2 -> 0.0),0.0
+Level ,5 f(0.0 -> 0.2),10.0
+Level ,6 f(0.2 -> 0.4),0.0
+Level ,7 f(0.4 -> 0.6),9.027777777777777
+Level ,8 f(0.6 -> 0.8),7.747605164514786
+Level ,9 f(0.8 -> 1.0),5.513612441686262

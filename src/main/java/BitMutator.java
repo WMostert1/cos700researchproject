@@ -5,7 +5,7 @@ import java.security.SecureRandom;
  */
 public abstract class BitMutator {
     protected static final double minimumAttributesCovered = 10.0;
-    private SecureRandom randomGen;
+    protected SecureRandom randomGen;
 
     public BitMutator(){
         randomGen = new SecureRandom();
