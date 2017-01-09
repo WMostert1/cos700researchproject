@@ -1,4 +1,3 @@
-
 \documentclass[journal,comsoc]{IEEEtran}
 \usepackage[T1]{fontenc}% optional T1 font encoding
 
@@ -8,9 +7,6 @@
 
 
 \usepackage{float}
-
-
-
 
 
 % *** CITATION PACKAGES ***
@@ -384,11 +380,10 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-Feature selection is a complex problem which has been addressed in many different ways. Feature selection algorithms that have been developed are often computationally expensive; provide
-an insignificant increase in predictor performance and can even start overfitting. The proposed
-research will investigate the combinatorial problem of selecting feature sets for optimal performance by a given classifier. By analysing the fitness landscape of the feature selection problem
-it is envisaged to better understand the deeper problem. Landscape characteristics that have an influence on the search algorithms are investigated. It is hoped that the analysis
-provides insight into choosing a warranted feature selection algorithm for future research.
+Feature selection is a complex problem which has been addressed in many different ways. Feature selection algorithms extract a subset of features from an overarching feature set which can greatly improve algorithm performance and accomplish dimensionality reduction. Feature selection algorithms that have been developed are often computationally expensive; provide
+an insignificant increase in predictor performance and can lead to overfitting. The paper
+investigates the combinatorial problem of selecting feature sets using a given classifier. By analyzing the fitness landscape of the feature selection problem space,
+it is envisaged to better understand the problem. Landscape characteristics that have an influence on the search algorithms are investigated.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -406,44 +401,76 @@ Feature Selection, Fitness Landscape, Landscape Analysis
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
 
-
-
 \section{Introduction}
 
-It is a known and easily comprehensible fact that humans effortlessly find patterns in their daily lives. The recognition of these patterns allows for the perception of arbitrary objects such as other humans, physical objects etc. Within the field of Machine Learning it often times attempted to accomplish these pattern recognition goals \cite{simon2013too} since it is of such great value in fields such as Computer Vision  \cite{wernick2010machine}.\\
-Various techniques to date have been developed in the form of classification techniques \cite{nguyen2008survey} , otherwise referred to as classifiers, in order to recognize patterns in data. Classifiers generally work on a similar premise: some conclusion is made with respect to a set of parameters in data. These parameters in the observed data can also be called features. Chandrashekar and Sahin define a feature as "an individual measurable property of the process being observed" \cite{chandrashekar2014survey}. Intuitively speaking, when a human is given the task of recognizing a friend or family member, how can the individual be identified, i.e. classified in terms of identity? The human may perhaps take into account physical features such as the person's facial features, voice or even smell. A classifier would similarly take into account some set or subset of all possible features that could conceptually be present in this scenario in order to classify the person as a unique individual. Given the fact that the classifier uses features to do classification, it becomes a complex problem to decide on which features are the most information rich to provide for an accurate classification.\\
-The problem of feature selection is that of selecting a subset of all available features. Feature selection is beneficial in order to better understand and visualize data as well as improving classification performance by effectively reducing the dimensionality of the problem \cite{guyon2003introduction}. Modern problems such as image classification suffer from extremely high dimensionality, thus affecting classifier performance. There exist many approaches of feature selection of which many have proven to be problem dependent and have had varying measures of success \cite{chandrashekar2014survey}. The issue of feature irrelevance comes to light in terms of feature selection for classifiers. Two features that are considered within mutual exclusion could be useless, but the union of these features could be of massive importance \cite{guyon2003introduction}. A primitive approach to solving this problem would be to do an exhaustive search of the combination of features to use that provides optimal performance. Given a small number of features this is conceptually possible, however, 
- as stated by Amaldi  et. al \cite{amaldi1998approximability} the full permutation of feature sets for a highly dimensional problem is a Non-Polynomial (NP)-hard problem.\\
-In order to further the development of a generalized theoretical framework for feature selection and to better understand the problem of feature selection this paper analyses the fitness landscape of the feature selection space with respect to simple and non-stochastic classifier.
+It is a known fact that humans seemingly effortlessly find patterns in their daily lives. This allows for the perception and detection of arbitrary objects such as other humans and visual keys in the environment. Within the field of machine learning it often attempted to accomplish these goals, since it is of such great value in fields such as computer vision \cite{wernick2010machine}.
 
-\section{Background}
+Various different classification techniques to date have been developed \cite{nguyen2008survey}, otherwise referred to as classifiers, in order to recognize patterns in data. Classifiers generally work on a similar premise: some conclusion is made with respect to a set of parameters in data. These parameters in the observed data can also be called features. Chandrashekar and Sahin define a feature as "an individual measurable property of the process being observed" \cite{chandrashekar2014survey}. Intuitively speaking, when a human is given the task of recognizing a friend or family member, how can the individual be identified? The human may perhaps take into account physical features such as the person's facial features; voice or even smell. Given the fact that a classifier needs features to perform classification, it becomes a complex problem to decide on which features are the most information rich to provide for a performant classification. Heuristics have been used to great success for classification in combinatorial problems, with little explanation as to why they perform well or not \cite{belaidouni1999landscapes}. The features that are used to perform classification could greatly influence the performance of heuristic techniques.
 
-There are various feature selection algorithms which have been developed to date, and there is still current research on the topic \cite{kira1992feature, jain1997feature, kohavi1997wrappers, yu2003feature, yeh2016feature, ge2016mctwo}. These generally fall into three categories namely Filter Methods, Wrapper Methods and Embedded Methods \cite{chandrashekar2014survey}. There is evidently no shortage of algorithms for conducting feature selection. The algorithms are extensively diverse in how the problem is approached. There is however no theoretical framework in place to guide researchers in making decisions on which algorithms to use \cite{guyon2003introduction}. As stated byGuyon and Elliseeff, feature selection methods may be used to improve classifier performance. They did however find that for problems of high dimensionality the performance increase is not always significant.  As stated by Pitzer et al. "the most common motivation for fitness landscape analysis is to gain a better understanding of algorithm performance on a related set of problem instances." \cite{pitzer2012comprehensive}. Since the feature selection problem is rather complex it is useful to do landscape analysis in order to be able to obtain more detailed understanding of the whole problem. An underlying fitness landscape can be a valuable tool for analysis for heuristic search algorithms \cite{pitzer2012comprehensive}. There are various characteristics of a fitness landscape that can be investigated and also many different techniques that may be applied in order to analyze these characteristics \cite{malan2013survey} . Some fitness landscapes possess structural attributes that can lead search algorithms to good or bad solutions; these measurements are normally only indicative for a certain algorithm \cite{malan2013survey}.  
+In order to further the development of a generalized theoretical framework for feature selection and to better understand the feature selection problem this paper analyzes the fitness landscape of the feature selection space with respect to a simple and non-stochastic classifier. Since feature selection is a binary problem, the landscape that is analyzed is discrete. A variety of data sets are considered with varying number of features, types of features and data set sizes.
 
-NOTE: Not done yet - still need to allow for a better explanation of fitness landscape analysis
+Section II gives an overview of the feature selection problem and fitness landscape analysis. Landscape characteristics that are considered in this paper are discussed in Section III. Section IV describes the details of conducting the fitness landscape analysis for the feature selection problem and analyzing landscape characteristics. Finally, the experimental results are given.
+
+\section{Feature Selection}
+The feature selection problem is that of selecting a subset of all available features. Feature selection is beneficial in order to better understand and visualize data as well as improving classification performance by effectively reducing the dimensionality of the problem \cite{guyon2003introduction}. Modern problems such as image classification suffers from extremely high dimensionality, thus affecting classifier performance. There exist many approaches of feature selection, of which many have proven to be problem dependent and have had varying measures of success \cite{chandrashekar2014survey}.
+
+Since choosing a subset of features from the complete feature set $F$ is a combinatorial problem, the subset $F_s \subseteq F$ can be represented as a binary string $S_i$. An 'on' bit in the string represents the inclusion of the feature, whereas conversely, an 'off' represents its exclusion. In this format it is possible to model a full permutation of all possible inclusions and exclusions of subsets, of the complete feature set $F$. In order to analyze a fitness landscape, the precondition is that it is computationally possible to calculate a fitness value at a given point in the landscape, $f(S_i)$, where $f$ is the fitness function. A unique bit string is referred to as a "problem instance" within the context of this paper.
+
+The issue of feature irrelevance comes to light since two features that are considered within mutual exclusion, could be useless, but the union of these features could be of massive importance \cite{guyon2003introduction}. A primitive approach to solving this problem would be to do an exhaustive search of the combination of features, which results in optimal performance. Given a small number of features this is conceptually possible, however,  as stated by Amaldi  \textit{et al}. \cite{amaldi1998approximability} the full permutation of feature sets for a highly dimensional problem is a non-polynomial (NP)-hard problem.
+There are various feature selection algorithms which have been developed to date, and there is still current research on the topic \cite{kira1992feature, jain1997feature, kohavi1997wrappers, yu2003feature, yeh2016feature, ge2016mctwo}. These generally fall into three categories namely filter methods, wrapper methods and embedded methods \cite{chandrashekar2014survey}. There is evidently no shortage of algorithms for conducting feature selection. The algorithms are diverse in how the problem is approached, however, there seems to be no theoretical framework in place to guide researchers in making decisions on which algorithms to use \cite{guyon2003introduction}. As stated by Guyon and Elliseeff, feature selection methods may be used to improve classifier performance \cite{guyon2003introduction}. They did however find that for problems of high dimensionality the performance increase is not always significant. Since the feature selection problem is of a complex nature, it is useful to do landscape analysis in order to be able to obtain more detailed understanding of the problem.
+
+
+
+
+\section{Fitness Landscape Characteristics}
+
+An underlying fitness landscape can be a valuable tool for analysis of heuristic search algorithms \cite{pitzer2012comprehensive} since some fitness landscapes possess structural attributes that can lead search algorithms to good or bad solutions \cite{malan2013survey}. There are various characteristics of a fitness landscape that can be investigated and also many different techniques that may be applied in order to analyze these characteristics \cite{malan2013survey}. Fitness landscape characteristics such as fitness distributions, epistasis, neutrality etc. can prove vital in understanding why certain algorithms perform well on sets of problems and why others do not.
+A large number of landscape characteristics may be extracted from a landscape. The characteristics that are investigated are indicative of the shape of the discrete landscape.
+
+\subsection{Fitness Distribution}
+
+The fitness distribution characteristic can be calculated by the fitness function alone - dependent on the grouping strategy used. A simple grouping strategy that can be used is to bin the fitness function values into sub-ranges. This is only possible if the upper and lower bounds of the fitness function is known. In the case where the Kappa-statistic is used, a $B$ number of bins can be used to divide the range $[-1,1]$ into bins of equal size. The bins are initialized to a zero count and for each fitness value the corresponding bin's count is incremented during the walk in the landscape. This results in a histogram of number of fitness value instances for a range of fitness values. By constructing the fitness distribution histogram one may profile the problem to answer the question of how many configurations of the combinatorial problem result in a specific range of fitness values. The fitness distribution as calculated here has some similarities with the density of states technique \cite{asselmeyer1996smoothing}.
+
+\subsection{Hamming Distance in a Level}
+
+The hamming distance in a level as proposed by Belaidouni and Hao \cite{belaidouni1999landscapes} is a measurement of the similarity ,or the lack thereof, of problem instances within a range of fitness values. The authors describe a concept called an iso-cost level which is essentially a set of problem instances that correlate to the same fitness value. The distance $D$ in a set $A$  is defined as \cite{belaidouni1999landscapes}, 
+$$
+	D(A) = \frac{1}{|A^2|} \sum_{(S_i,S_j') \in L^2} d(S_i, S_j')
+$$
+where $L$ is the iso-cost level and $S_n$ is the $n$-th problem instance within the level. By using the iso-cost levels one could visualize this technique as calculating the disparity in the other relevant dimensions with respect to a thin slice of range in the fitness dimension. This could be viewed as a measure to indicate the width of the landscape \cite{belaidouni1999landscapes}. In the case of the discrete fitness landscape, this essentially gives a measure of if the solutions within the level are clustered around a specific point or are rather more distributed within the search space.
+
+HDIL as originally proposed defines a fitness level per unique cost value. A slight adaptation is made in this paper where instead of considering problem instances of a specific cost (fitness value), a grouping strategy is used for problem instances in the range of the bin sizes as used for the fitness distribution calculation.
 
 \section{Implementation}
-\subsection{Representation}
 
-Since the problem of choosing a subset of features from the complete feature set $F$ is a combinatorial problem, the subset of selected features $F_s$ can be represented as a binary string. An 'on' bit in the string represents the inclusion of the feature, whereas conversely, an 'off' represents its exclusion. In this format it is possible to model a full permutation of all possible inclusions and exclusions of subsets, of the complete feature set. In order to analyze a fitness landscape a precondition is that it is computationally possible to calculate a fitness value at a given point in the landscape (i.e. a specific configuration of 'on' and 'off' in the binary string). Using a binary string with a valid fitness function one may construct a binary landscape which can be analyzed.
+
+\begin{table*}[t]
+\centering
+\caption{Data Sets}
+\label{table1}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Data Set ID \& Name} & \textbf{Nominal Features} & \textbf{Numerical Features} & \textbf{Number of Classes} & \textbf{Number of Data Elements} & \textbf{Number of Features} \\ \hline
+Audiology & Yes & No & 24 & 226 & 70 \\ \hline
+Balance Scale & Yes & Yes & 3 & 625 & 5 \\ \hline
+Breast W & No & Yes & 2 & 699 & 10 \\ \hline
+Anneal.ORIG & Yes & Yes & 6 & 898 & 39 \\ \hline
+Letter & No & Yes & 26 & 20000 & 16 \\ \hline
+\end{tabular}
+\end{table*}
 
 \subsection{Fitness Function}
-Since one of the goals of feature selection is to be able to reduce the dimensionality of the classifier input, thus transitively improving performance, a measure of classification accuracy is used as the fitness value at a point. The choice of fitness function is of paramount importance when conducting fitness landscape analysis since there exists a variant of the landscape for disparate fitness functions and for variations in calculating the fitness based on different notions of neighborhood for the same fitness function \cite{malan2013survey}. It is desirable to be able to reliably reproduce the same landscape for a static data set. Fitness functions that are stochastic in nature such as Artificial Neural Networks using Stochastic Gradient Descent or Random Decision Forests could very likely provide for valid classification accuracy measurements but would introduce noise into the fitness landscape. This is due to the fact that since a stochastic classifier is generally executed multiple times and the resultant mean performance measurement is used. In such a case by reproducing the fitness landscape the difference between resultant curves within the hyper-dimensional problem space would become fuzzy due to stochasticity. Therefor the classic $k$-nearest-neighbor \cite{cunningham2007k}, a simple non-stochastic classifier is used. The $k$-nearest neighbor is essentially a clustering classifier which works primarily on the concept of a neighborhood. In the case of this binary representations, the neighborhood can be calculated as a $k$ number of instances or points that are the closest to the sampled point in terms of the hamming distance of a point with respect to the sampled point. The hamming distance essentially calculates the difference (or similarity) between two bit strings, therefor the most similar points in the problem space are considered the neighbors of the sampled point.
+A measure of classification accuracy is used as the fitness value at a problem instance, $S_i$. The choice of fitness function is of paramount importance when conducting fitness landscape analysis since there exists a variant of the landscape for disparate fitness functions and for variations in calculating the fitness based on different notions of neighborhood for the same fitness function \cite{malan2013survey}.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.5\linewidth]{kNearestNeighbour.png}
-\caption{$k$ - Nearest Neighbor}
-\end{figure}
+ Fitness functions, i.e. classifiers, that are stochastic in nature such as artificial neural networks using stochastic gradient descent or random decision forests could very likely provide for usable classification accuracy measurements but would introduce noise into the fitness landscape. This is due to the fact that since a stochastic classifier is generally executed multiple times and the resultant mean performance measurement is used. In such a case by reproducing the fitness landscape the difference between resultant error curves within the hyper-dimensional problem space would become fuzzy due to stochasticity. It is desirable to be able to reliably reproduce the same landscape for a static data set since this allows for landscape characteristics that are independent of change in time, or some other external variable that may affect the fitness calculation. Therefore the classic $k$-nearest-neighbor \cite{cunningham2007k}, a simple non-stochastic classifier is used.
 
-In order to the obtain a fitness value Cohen's Kappa-statistic , a non-biased, measure of classification accuracy is used. Cohen's Kappa is defined as \cite{ben2008comparison}:
+In order to obtain a fitness value,, Cohen's Kappa-statistic, a non-biased measure of classification accuracy, is used. Cohen's Kappa is defined as \cite{ben2008comparison}:
 
 \begin{equation}
 	K = \frac{P_0 - P_c}{1 - P_c}
 \end{equation}
 
 where $P_c$ is the agreement probability as a result of randomness and $P_0$ is the total agreement probability. The concept of agreement probability is quite simple. Given a confusion matrix as in figure \ref{fig:confuse}, the Kappa statistic would be calculated as follows:
-
 
 $$
 P_c = (\frac{86}{100})(\frac{84}{100}) + (\frac{14}{100})(\frac{16}{100}) = 0.0162
@@ -456,9 +483,9 @@ K = \frac{0.8 - 0.0162}{1 - 0.0162} = 0.7967
 \end{equation}
 \hfill\\
 
-The rate of agreement in this case is therefore 0.7967. The Kappa statistic ranges from total disagreement at -1 through completely random classification to 1 which indicates total agreement. The Kappa statistic allows for the level of agreement for each class label to be measured. This is important since for a raw count of correct classification, the results may be statistically biased due to an overwhelming presence or absence of a specific class in an observed data set.
+The rate of agreement in this case is therefore 0.7967. The Kappa statistic ranges from total disagreement at -1 through completely random classification at 0, to 1 which indicates total agreement. The Kappa statistic allows for the level of agreement for each class label to be measured. This is important since for a raw count of correct classification instances, the results may be statistically biased due to an overwhelming presence or absence of a specific class in an observed data set. The Kappa statistic removes the stochastic element in correct classification count \cite{ben2008comparison} and is also a normalized classification measure in the range [-1,1]. 
 
-\begin{figure}[H]
+\begin{figure}[t!]
 \centering
 \begin{tabular}{ r|c|c|l }
 \multicolumn{1}{r}{}
@@ -481,40 +508,139 @@ B & 9 & 5 & 14 \\
 \label{fig:confuse}
 \end{figure}
 
-\subsection{Data Sets}
+\subsection{Frameworks and Data Sets}
 
-A variety of data are utilized in order to conduct analysis. A total of X(to be filled in) data sets are used, which contains nominal and numerical data elements or features. No specific preprocessing of the data sets take place. The UCI repository is used to source a variety of data sets. Sample data sets range between X and X output classes with varying degrees of dimensionality from X(to be filled in) to X(to be filled in) features.
+The UC Irvine Machine Learning Repository, which contains a wide variety of data sets that can be used for various machine learning objectives, was used as a source of data sets \cite{UCI}. A total of 5 data sets were used, which contain nominal and numerical data elements or features. No specific preprocessing of the data sets took place. Table \ref{table1} describes the data sets used.
+
+As an implementation framework the Weka Machine Learning software development kit by the University of Waikato was used \cite{weka}. 
 
 \subsection{Random Walk}
 
-One of the core practices of landscape analysis is the concept of sampling the problem space in order to gain sufficient information about the problem space. There are various ways to accomplish this task. One such method is uniform sampling. Within the context of binary landscapes this entails choosing a random bit string which maps to a configuration within the hypercube of all possible configurations. Naively one may convert the bit string of length $N$ to a real value with the formula $x = 2^N-1$ and sample a value from a uniform distribution constrained by 0 and $x$. However, for a large value of $N$ (as is the case for hyper-dimensional problems) this number becomes exponentially large and difficult to deal with. Another possible solution is to decide for each value within the bit string its on or off value based on if its over or under the median of any constrained uniform distribution, such as 0.5 between 0 and 1. A uniform sample though presents an issue. Problems that are of vastly high dimensionality have an excessively large search space and simple sample with an insufficient number of points sampled with respect to the size of the search space may heed misleading results.\\
+One of the core practices of landscape analysis is the concept of sampling the problem space in order to gain sufficient information about the problem space. There are various possible methods to accomplish this task. One such method is uniform sampling. Within the context of discrete landscapes this entails choosing a random bit string which maps to a configuration within the hypercube of all possible configurations, i.e. problem instances. Naively one may convert the bit string of length $N$ to a real value with the formula $x = 2^N-1$ and sample a value from a uniform distribution constrained by 0 and $x$. However, for a large value of $N$ (as is the case for hyper-dimensional problems) this number becomes exponentially large and difficult to deal with. Another possible solution is to decide for each value within the bit string its on or off value based on if its above or below the median of any constrained uniform distribution, such as 0.5 between in the range $[0,1]$
 
-NOTE: Discuss with Dr. Malan the difference between uniform sampling from a highly dimensional problem space vs doing a random walk on an isometric landscape. Also, is it a guarantee that binary landscapes are isometric?
+ A uniform sample, though presents an issue. Problems that are of vastly high dimensionality have an excessively large search space and a simple sample with an insufficient number of points sampled with respect to the size of the search space may heed misleading results. Another issue with this approach is the fact that characteristics that are reliant on the concept of neighborhood will be suppressed.
 
-\subsection{Tools and Experimental Procedure}
+To address the neighborhood issue above, an initial random point is sampled after which the problem space is navigated by flipping a random number $\delta$ of bits in the bit string $S_i$, where $\delta$ is proportional to the dimensionality $I$ of the problem. This would allow the concept of neighborhood to be retained and the search space to not be underutilized. The value of $\delta$ was calculated as $\delta = k_sI$ where $k_s$ is a scaling constant, in this case set as 0.1. 
 
-NOTE: Explain that weka was used as a data mining utility and remember to reference it
+Taking the above into account, the concept of neighborhood for the random walk can thus be defined as,
+$$
+	N_i = \{ x | x \in F \, \text{and} \, d_H(x) = \delta \}
+$$
+where $d_H$ is the hamming distance. 
 
-\subsection{Assumptions and Limitations}
-
-NOTE: Explain here that a single classifier is used and that the landscapes would probably differ between classifiers for the same data sets. It may be useful in future for research to see what the difference is between the landscapes that are analyzed when conducting the analysis on the same data sets for different classifiers. 
-
-\section{Fitness Landscape Characteristics}
-\subsection{Fitness Distribution}
-
-NOTE: Explain here what fitness distribution is, and how it is interpreted
-
-\subsection{Hamming Distance between Levels}
-
-NOTE: Explain here what hamming distance between levels is and how to interpret it
-
-\subsection{Some other characteristic possibly}
-
-NOTE: to be confirmed
+Another important parameter to the random walk is the number of steps, i.e. the length of the walk. It would not be fair to do walks of the same length, in a discrete landscape, for a problems that differ in the degree of dimensionality. If the same number of steps were taken the larger landscape would be much further explored than the smaller landscape. Therefore, the number of steps to take $w$ was calculated as,
+$$
+ w = k_w I
+$$
+where $k_w$ scales the walking distance. This ensured that the same ratio of the landscapes were covered by the walk. In this case $k_w$ was set to 300.
 
 \section{Research Results}
-\subsection{Fitness Distribution}
-\subsection{Hamming Distance between Levels}
+
+The fitness distributions for each data set, which is the fitness frequency for different fitness levels, are shown in Table \ref{results-raw}. The fitness levels are  decided to be at intervals of 0.2 from 0 to 1. The Kappa statistic, which is used to calculate fitness, does not dictate how it should be interpreted and thus the literature seems to have developed different interpretations. One such interpretation is \cite{altman1990practical}:
+
+\begin{itemize}
+\item
+Poor - $f(x) < 0.20$
+\item
+Fair - $0.20 < f(x) \leq 0.40$
+\item
+Moderate - $0.40 < f(x) \leq 0.60$
+\item Good - $0.60 < f(x) \leq 0.80$
+\item Very good  -$ 0.80 < f(x) \leq 1.00$
+\end{itemize}
+
+Cohen's Kappa statistic is calculated to be a scalar value in the range $[-1,1]$, however for all data sets tested there was no case where the kappa statistic calculated was within the range $[-1,0)$. It is actually quite rare for the calculated Kappa statistic to be less than 0 in practice for classification. This would mean that the observed level of agreement is less than expected level of agreement by chance. The fitness distribution (FD) is normalized to the 0 to 1 range in Table \ref{results-raw} for visual convenience. 
+
+\begin{table}[H]
+\centering
+\caption{Results}
+\label{results-raw}
+\begin{tabular}{lll}
+\textbf{Data Set 1} & HDIL & Normalized FD \\ \hline
+\multicolumn{1}{|l|}{$f(x) <  0.2$} & \multicolumn{1}{l|}{37.2943} & \multicolumn{1}{l|}{0.0765} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{35.8924} & \multicolumn{1}{l|}{0.4012} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{35.8436} & \multicolumn{1}{l|}{0.4340} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{37.0920} & \multicolumn{1}{l|}{0.0882} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\textbf{\begin{tabular}[c]{@{}l@{}}Data Set 2\end{tabular}} &  &  \\ \hline
+\multicolumn{1}{|l|}{$f(x) < 0.2$} & \multicolumn{1}{l|}{3.8712} & \multicolumn{1}{l|}{0.2313} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{3.0076} & \multicolumn{1}{l|}{0.4967} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{3.6805} & \multicolumn{1}{l|}{0.2093} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{5.0000} & \multicolumn{1}{l|}{0.0627} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\textbf{Data Set 3} &  &  \\ \hline
+\multicolumn{1}{|l|}{$f(x) < 0.2$} & \multicolumn{1}{l|}{10.0000} & \multicolumn{1}{l|}{0.0030} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{9.0278} & \multicolumn{1}{l|}{0.0040} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{7.6767} & \multicolumn{1}{l|}{0.0183} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{5.5266} & \multicolumn{1}{l|}{0.9747} \\ \hline
+\textbf{Data Set 4} &  &  \\ \hline
+\multicolumn{1}{|l|}{$f(x) < 0.2$} & \multicolumn{1}{l|}{26.9497} & \multicolumn{1}{l|}{0.0022} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{22.5481} & \multicolumn{1}{l|}{0.0277} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{20.5674} & \multicolumn{1}{l|}{0.2217} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{20.0692} & \multicolumn{1}{l|}{0.5892} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{21.2160} & \multicolumn{1}{l|}{0.1591} \\ \hline
+\textbf{Data Set 5} &  &  \\ \hline
+\multicolumn{1}{|l|}{$f(x) < 0.2$} & \multicolumn{1}{l|}{14.4400} & \multicolumn{1}{l|}{0.0010} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{11.5693} & \multicolumn{1}{l|}{0.0163} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{10.1475} & \multicolumn{1}{l|}{0.1039} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{9.1494} & \multicolumn{1}{l|}{0.4192} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{9.4104} & \multicolumn{1}{l|}{0.4596} \\ \hline
+\end{tabular}
+\end{table}
+
+For easy interpretation,Figure 2 shows a graph of the normalized fitness distributions for the various data sets. At this point it may be noted that the fitness distributions differ quite significantly.
+
+Most of the data sets have a low proportion of solutions in the high fitness range (above 0.8 accuracy). Data sets 3 and 5 are exceptions. This indicates that these datasets have a large number of feature selection solutions that give reasonable accuracy levels, and will probably be easier to search for a good solution.
+
+\begin{figure}[H]
+\label{fitness-dist}
+\caption{Fitness Distribution}
+\includegraphics[width=\linewidth]{fitness-dist}
+\end{figure}
+
+The hamming distance in a level (HDIL) is indicative of the width of the landscape for the different fitness levels. In other words, how clustered the solutions within the specific fitness level are. Since Hamming Distance measures the number of bits that differ between two bit strings, the maximum possible hamming distance between two bit strings is the length of the bit string. The length of the bit string for the discrete landscape is the dimensionality,  $I$, of the problem.
+Table \ref{dim} shows the HDIL difference with respect to the dimensionality of the problem.
+
+ \begin{table}[H]
+\centering
+\caption{HDIL difference with respect to the dimensions of the problem}
+\label{dim}
+\begin{tabular}{lll}
+\textbf{Data Set 1 ($I = 70$)} & HDIL & Dimensional Difference \\ \hline
+\multicolumn{1}{|l|}{$ f(x) < $ 0.2} & \multicolumn{1}{l|}{37.2943} & \multicolumn{1}{l|}{0.5328} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{35.8924} & \multicolumn{1}{l|}{0.5127} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{35.8436} & \multicolumn{1}{l|}{0.5121} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{37.0920} & \multicolumn{1}{l|}{0.5299} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\textbf{Data Set 2 ($I = 5$)} & \\ \hline
+\multicolumn{1}{|l|}{$ f(x) < $ 0.2} & \multicolumn{1}{l|}{3.8712} & \multicolumn{1}{l|}{0.7742} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{3.0076} & \multicolumn{1}{l|}{0.6015} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{3.6805} & \multicolumn{1}{l|}{0.7361} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{5.0000} & \multicolumn{1}{l|}{1.0000} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\textbf{Data Set 3 ($I = 10$)} &   \\ \hline
+\multicolumn{1}{|l|}{$ f(x) < $ 0.2} & \multicolumn{1}{l|}{10.0000} & \multicolumn{1}{l|}{1.0000} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{0.0000} & \multicolumn{1}{l|}{0.0000} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{9.0278} & \multicolumn{1}{l|}{0.9028} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{7.6767} & \multicolumn{1}{l|}{0.7677} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{5.5266} & \multicolumn{1}{l|}{0.5527} \\ \hline
+\textbf{Data Set 4 ($I = 39$)} &   \\ \hline
+\multicolumn{1}{|l|}{$ f(x) < $ 0.2} & \multicolumn{1}{l|}{26.9497} & \multicolumn{1}{l|}{0.6910} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{22.5481} & \multicolumn{1}{l|}{0.5782} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{20.5674} & \multicolumn{1}{l|}{0.5274} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{20.0692} & \multicolumn{1}{l|}{0.5146} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{21.2160} & \multicolumn{1}{l|}{0.5440} \\ \hline
+\textbf{Data Set 5 ($I = 16$)} &  \\ \hline
+\multicolumn{1}{|l|}{$ f(x) < $ 0.2} & \multicolumn{1}{l|}{14.4400} & \multicolumn{1}{l|}{0.9025} \\ \hline
+\multicolumn{1}{|l|}{0.2 $ < f(x) \leq $ 0.4} & \multicolumn{1}{l|}{11.5693} & \multicolumn{1}{l|}{0.7231} \\ \hline
+\multicolumn{1}{|l|}{0.4 $ < f(x) \leq $ 0.6} & \multicolumn{1}{l|}{10.1475} & \multicolumn{1}{l|}{0.6342} \\ \hline
+\multicolumn{1}{|l|}{0.6 $ < f(x) \leq $ 0.8} & \multicolumn{1}{l|}{9.1494} & \multicolumn{1}{l|}{0.5718} \\ \hline
+\multicolumn{1}{|l|}{0.8 $ < f(x) \leq $ 1.0} & \multicolumn{1}{l|}{9.4104} & \multicolumn{1}{l|}{0.5882} \\ \hline
+\end{tabular}
+\end{table}
+
+ In order to compare the HDIL values for the different data sets the HDIL values are normalized linearly to the same 0 to 1 scale as with the fitness distribution frequencies, called Dimensional Difference, in table \ref{dim}. Dimensionality Difference is calculated as $ D(L) = HDIL(L)/I$, where $L$ is the fitness level. The HDIL measure is essentially the average Hamming Distance between solutions in a level. The Dimensional Difference thus shows by how much solutions in a level differed with respect to the dimensionality of the problem. As can be observed, a commonality can be seen between all the tested levels and data sets. The minimum observed Dimensionality Difference for all levels is $0.5121$. It can thus be said that for such high HDIL values, the specific bit strings (solutions) in all levels are not close together or clustered in a group. This does not however mean that they do not form part of a larger cluster that spans multiple levels.
 
 
 % An example of a floating figure using the graphicx package.
@@ -611,13 +737,13 @@ NOTE: to be confirmed
 % footnotes above bottom floats. This can be corrected via the
 % \fnbelowfloat command of the stfloats package.
 
-
 \section{Conclusion}
 
-NOTE: To be completed
+Taking the fitness distributions into consideration, it is evident that there is little commonality between fitness distributions for a given classifier and a variety of problems using a specific subset of features. This could likely be due to the simplicity of the classifier that is used. Investigating the fitness distributions for a set of classifiers on a set of problems could perhaps provide for a better profiling of the feature selection problem. 
 
+Finally, for the different fitness levels it was found that solutions within all levels are highly scattered throughout the level, with an average of at least $51\%$ difference between bit strings within any level. This finding can be applied to further the development of new techniques for feature selection, or the improvement of existing techniques. Heuristic based techniques could possibly greatly benefit from prior knowledge of such structural elements in the feature selection search space. 
 
-
+Future work will include investigating the link between fitness landscape features and the performance of algorithms for the feature selection problem.
 
 
 % if have a single appendix:
@@ -634,21 +760,17 @@ NOTE: To be completed
 % starts a section numbered zero.)
 %
 
+%\appendices
+%\section{Proof of the First Zonklar Equation}
+%Appendix one text goes here.
 
-\appendices
-\section{Proof of the First Zonklar Equation}
-Appendix one text goes here.
-
-
-The authors would like to thank...
-
+%The authors would like to thank...
 
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
 \ifCLASSOPTIONcaptionsoff
   \newpage
 \fi
-
 
 
 % trigger a \newpage just before the given reference
@@ -670,7 +792,6 @@ The authors would like to thank...
 % argument is your BibTeX string definitions and bibliography database(s)
 %\bibliography{IEEEabrv,../bib/paper}
 %
-
 
 \bibliographystyle{IEEEtran} 
 \bibliography{references}

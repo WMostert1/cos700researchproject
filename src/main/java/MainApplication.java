@@ -21,15 +21,16 @@ import java.util.List;
 public class MainApplication {
     public static void main(String [] args) throws Exception {
         String [] dataSets = new String[]{
-                "anneal.ORIG.arff",
-                //"arrhythmia.arff",
-                "audiology.arff",
-               // "autos.arff",
-                "balance-scale.arff",
-                "breast-w.arff",
-               // "letter.arff"
-               // "bridges_version1.arff",
+//                "anneal.ORIG.arff",
+//                //"arrhythmia.arff",
+//                "audiology.arff",
+//               // "autos.arff",
+//                "balance-scale.arff",
+//                "breast-w.arff",
+//                "letter.arff"
+//                "bridges_version1.arff",
                 //"car.arff"
+                "autos.arff"
         };
 
         for (String dataSet : dataSets) {
