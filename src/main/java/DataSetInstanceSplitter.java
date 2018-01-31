@@ -6,11 +6,11 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  * Created by bbdnet1339 on 2016/08/08.
  *
  */
-public class InstanceSplitter {
+public class DataSetInstanceSplitter {
     private double trainingPercentage;
     private Instances data;
 
-    public InstanceSplitter(Instances inst,double trainingPercentage) throws Exception {
+    public DataSetInstanceSplitter(Instances inst, double trainingPercentage) throws Exception {
         this.trainingPercentage = trainingPercentage;
         this.data = inst;
     }

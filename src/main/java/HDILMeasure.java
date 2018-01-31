@@ -32,10 +32,15 @@ public class HDILMeasure implements IMeasure {
 
     public void get(Map<boolean [], Double> results){
         double increment = (upperBound-lowerBound)/numberOfIsoLevels;
-        results.forEach((arr,fitness)->{
+        //increment = bin sizes
+
+        results.forEach((boolean[] arr, Double fitness) ->{
             for(int i = 0; i < numberOfIsoLevels; i++){
-                if(fitness >= lowerBound+(increment*i) && fitness < lowerBound+(increment*(i+1))){
+                double isoLow = lowerBound+(increment*i);
+                double isoHigh = lowerBound+(increment*(i+1));
+                if(fitness >= isoLow && fitness < isoHigh){
                     isoLevels.get(i).put(arr,fitness);
+                    break;
                 }
             }
         });
@@ -77,11 +82,7 @@ public class HDILMeasure implements IMeasure {
             outF.nextRow();
             System.out.println(x + " : " +y);
         });
-        try {
-            outF.save();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private static double round (double value, int precision) {
@@ -94,11 +95,17 @@ public class HDILMeasure implements IMeasure {
         ArrayList<Boolean> l2 = new ArrayList<>();
         for(boolean b : arr1) l1.add(b);
         for(boolean b : arr2) l2.add(b);
+
+        //At this point l1 == arr1
+        //              l2 == arr2
+
         while(l1.size() < l2.size()) l1.add(0,false);
         while(l2.size() < l1.size()) l2.add(0,false);
+        //normalize so that bit strings are of equal length
+
         int count = 0;
         for(int i = 0; i < l1.size();i++){
-            if(l1.get(i) == l2.get(i))
+            if(l1.get(i) != l2.get(i))
                 count++;
         }
         return count;

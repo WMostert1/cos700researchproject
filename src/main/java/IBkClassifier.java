@@ -7,6 +7,7 @@ import weka.core.Instances;
  * Created by bbdnet1339 on 2016/08/08.
  */
 public class IBkClassifier implements IClassify {
+    //Returned as the kappa statistic
     @Override
     public double getClassificationAccuracy(Instances training, Instances testing) throws Exception {
         Classifier ibk = new IBk();
@@ -17,4 +18,6 @@ public class IBkClassifier implements IClassify {
         eval.evaluateModel(ibk, testing);
         return eval.kappa();
     }
+
+
 }
