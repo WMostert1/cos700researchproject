@@ -1,3 +1,5 @@
+package mutators;
+
 import java.security.SecureRandom;
 
 /**
@@ -10,7 +12,7 @@ public abstract class BitMutator {
     public BitMutator(){
         randomGen = new SecureRandom();
     }
-    abstract boolean [] mutate(boolean[] arr);
+    public abstract boolean [] mutate(boolean[] arr);
 
     public boolean satisifesMinimumPercentageAttributes(boolean [] arr){
         if(!arr[arr.length -1])

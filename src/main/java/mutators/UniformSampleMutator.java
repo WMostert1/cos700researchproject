@@ -1,3 +1,5 @@
+package mutators;
+
 import java.util.Arrays;
 
 /**
@@ -5,7 +7,7 @@ import java.util.Arrays;
  */
 public class UniformSampleMutator extends BitMutator {
     @Override
-    boolean[] mutate(boolean[] arr) {
+    public boolean[] mutate(boolean[] arr) {
         boolean [] newArr = new boolean[arr.length];
         int i = 0;
         for(;i < arr.length-1;i++){

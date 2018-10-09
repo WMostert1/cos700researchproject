@@ -1,3 +1,5 @@
+package mutators;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +9,7 @@ import java.util.List;
  * Created by bbdnet1339 on 2016/08/08.
  *
  */
-public class UniformBitMutator extends BitMutator{
+public class UniformBitMutator extends BitMutator {
     private double bitfactor = 0.1;
 
     public UniformBitMutator(double bitfactor){
