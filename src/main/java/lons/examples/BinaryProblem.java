@@ -21,8 +21,9 @@ public interface BinaryProblem extends Problem<BinarySolution>
      */
     static int getIndexOfBitString(boolean[] x) {
         int index = 0;
-        for (int i=0; i<Math.min(x.length,MAX_BITS_UNIQUE); i++)
-            index += x[i] ? BinaryProblem.bitPowers[i] : 0;
+        int dimensions = Math.min(x.length,MAX_BITS_UNIQUE);
+        for (int i=0; i<dimensions; i++)
+            index += x[i] ? BinaryProblem.bitPowers[dimensions-1-i] : 0;
         return index;  
     }
     

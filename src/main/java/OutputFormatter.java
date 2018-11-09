@@ -24,12 +24,13 @@ public class OutputFormatter {
         csvString += "\n";
     }
 
-    public void addAsColumns(String [] vals){
+    public void addAsColumns(String ... vals){
         int i = 0;
         for(;i<vals.length-1;i++){
-            csvString += vals[i]+",";
+            csvString += vals[i]+";";
         }
         csvString += vals[i];
+        nextRow();
     }
 
     public void save() throws FileNotFoundException, UnsupportedEncodingException {

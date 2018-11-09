@@ -39,7 +39,7 @@ public class Weight
      * 
      * @return weight stored
      */
-    int getWeight() {
+    public int getWeight() {
         return weight;
     }
 }

@@ -1,14 +1,16 @@
+import lons.examples.BinarySolution;
 import weka.core.Instances;
 
 public class FSBundle {
     private Instances data;
     private double accuracy;
-    private int [] attributes;
+    private BinarySolution binarySolution;
 
-    public FSBundle(Instances data, double accuracy, int[] attributes) {
+
+    public FSBundle(Instances data, double accuracy, BinarySolution binarySolution) {
         this.data = data;
         this.accuracy = accuracy;
-        this.attributes = attributes;
+        this.binarySolution = binarySolution;
     }
 
     public Instances getData() {
@@ -27,11 +29,11 @@ public class FSBundle {
         this.accuracy = accuracy;
     }
 
-    public int[] getAttributes() {
-        return attributes;
+    public BinarySolution getBinarySolution() {
+        return binarySolution;
     }
 
-    public void setAttributes(int[] attributes) {
-        this.attributes = attributes;
+    public void setBinarySolution(BinarySolution binarySolution) {
+        this.binarySolution = binarySolution;
     }
 }

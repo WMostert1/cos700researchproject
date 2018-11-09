@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import exceptions.DataException;
 import lons.examples.BinarySolution;
 import lons.examples.ConcreteBinarySolution;
@@ -8,6 +9,7 @@ import samplers.SolutionSampler;
 import weka.core.Instances;
 
 import javax.xml.crypto.Data;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,20 +18,15 @@ import java.util.Map;
  *
  */
 public class LandscapeEvaluator {
-    private BitMutator mutator;
-    private int stepMultiplier;
-    private OutputFormatter outF;
-    private String dataSetName;
-    
-    private IClassify classifier;
-    public double trainingPercentage = 66.0;
 
-    public LandscapeEvaluator(int stepMultiplier, BitMutator mutator, IClassify classifier, String dataSetName, OutputFormatter outputFormatter){
-        this.stepMultiplier = stepMultiplier;
-        this.mutator = mutator;
+
+    private IClassify classifier;
+    public static final double trainingPercentage = 50.0;
+
+    public LandscapeEvaluator(IClassify classifier){
+
         this.classifier = classifier;
-        this.outF = outputFormatter;
-        this.dataSetName = dataSetName;
+
     }
 
     private Double getQuality(boolean [] solution, Instances data) throws Exception {
@@ -43,6 +40,8 @@ public class LandscapeEvaluator {
 
     protected Map<ConcreteBinarySolution, Double> sampleLandscape(Instances data) throws Exception {
         HashMap<ConcreteBinarySolution, Double> fitnessMap = new HashMap<>();
+
+
 
         //RandomWalkSampler sampler = new RandomWalkSampler(mutator, data.numAttributes(), stepMultiplier);
         SolutionSampler<boolean []> sampler = new ExhaustiveSampler(data.numAttributes()-1);
@@ -60,6 +59,12 @@ public class LandscapeEvaluator {
             sampler.showProgress();
         }
         while(!sampler.isDone());
+//
+//        try (PrintWriter out = new PrintWriter("./"+dataSetName +".fitness.db")) {
+//            System.out.println("Saving fitness DB for "+dataSetName);
+//            out.print(mapper.writeValueAsString(fitnessMap));
+//            System.out.println("Saved fitness DB for "+dataSetName);
+//        }
 
         return fitnessMap;
     }
@@ -73,15 +78,7 @@ public class LandscapeEvaluator {
             throw new DataException("Data sets with more than 31 attributes not currently supported.");
         }
 
-        //Some info on the data set that is being used
-        outF.addAsColumns(new String[]{"Number of Attributes for Data Set: ", Integer.toString(data.numAttributes())});
-        outF.nextRow();
 
-        outF.addAsColumns(new String[]{"Number of Instances in Data Set: ",Integer.toString(data.numInstances())});
-        outF.nextRow();
-
-        outF.addAsColumns(new String[]{"Number of Classes in Data Set: ",Integer.toString(data.numClasses())});
-        outF.nextRow();
 
         //At this point it will be a randomly initialised point - initial point
 
