@@ -5,7 +5,6 @@ import lons.LONGenerator;
 import lons.RVisualizationFormatter;
 import lons.Weight;
 import lons.examples.*;
-import mutators.UniformSampleMutator;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -19,7 +18,7 @@ import java.util.*;
  * Created by bbdnet1339 on 2016/08/05.
  *
  */
-public class MainApplication {
+public class EvoCOPPaperApplication {
     public static final int DECIMAL_PLACES = 8;
     private static void sortIntArr(int [] arr){
         for(int i = 0; i < arr.length; i++){
@@ -66,7 +65,7 @@ public class MainApplication {
 
 
     private static Instances getDataSet(String name) throws Exception {
-        DataSource source = new DataSource(MainApplication.class.getResourceAsStream("data-sets/used/" + name+".arff"));
+        DataSource source = new DataSource(EvoCOPPaperApplication.class.getResourceAsStream("data-sets/appropriate/" + name+".arff"));
         boolean removeRedundantManual = false;
 
         if(removeRedundantManual){
@@ -116,11 +115,11 @@ public class MainApplication {
 //        dataSets.add("breast-cancer");
 //        dataSets.add(ZOO);
 //        dataSets.add("page-blocks");
-//        dataSets.add(VOWEL);
-//        dataSets.add(BREAST_W);
-//        dataSets.add("heart-statlog");
+        dataSets.add(VOWEL);
+//        dataSets.add(BREAST_W)
+// dataSets.add("heart-statlog");
 //        dataSets.add("diabetes");
-          dataSets.add("credit-g");
+//          dataSets.add("zoo");
 
         OutputFormatter outF = new OutputFormatter("out/test.csv");
         List<String> badSets = new ArrayList<>();

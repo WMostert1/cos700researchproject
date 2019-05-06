@@ -28,10 +28,11 @@ public class IBkClassifier implements IClassify {
         }
 
         ibk.buildClassifier(training);
+
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(ibk, testing);
         BigDecimal bd = new BigDecimal(eval.kappa());
-        bd = bd.setScale(MainApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
+        bd = bd.setScale(EvoCOPPaperApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 

@@ -3,7 +3,6 @@ import lons.examples.BinarySolution;
 import lons.examples.ConcreteBinarySolution;
 import weka.attributeSelection.*;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
@@ -238,7 +237,7 @@ public class FeatureSelectorUtils {
                 throw new RuntimeException("Unknown solution!");
             }
 
-            System.out.println(MainApplication.calculatePercentageCap(accuracy, fitnessMap.get(globalOptimas.get(0))));
+            System.out.println(EvoCOPPaperApplication.calculatePercentageCap(accuracy, fitnessMap.get(globalOptimas.get(0))));
             FSBundle bundle = new FSBundle(FeatureSelectorUtils.getInstancesFromAttributeInclusionIndicesArr(splitter.getTestingSet(), subAttributes),
                     accuracy,
                     subSolution);
@@ -264,10 +263,10 @@ public class FeatureSelectorUtils {
         meanAccuracy /= GA_RUNS;
 
         BigDecimal bdMeanAccuracy = new BigDecimal(meanAccuracy);
-        bdMeanAccuracy = bdMeanAccuracy.setScale(MainApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
+        bdMeanAccuracy = bdMeanAccuracy.setScale(EvoCOPPaperApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
 
         BigDecimal bdSuccessRatio = new BigDecimal(successCount/(double)GA_RUNS);
-        bdSuccessRatio = bdSuccessRatio.setScale(MainApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
+        bdSuccessRatio = bdSuccessRatio.setScale(EvoCOPPaperApplication.DECIMAL_PLACES, RoundingMode.HALF_UP);
 
 
         return new GAResult(bestBundle, bdMeanAccuracy.doubleValue(), bdSuccessRatio.doubleValue());

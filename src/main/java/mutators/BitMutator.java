@@ -6,7 +6,7 @@ import java.security.SecureRandom;
  * Created by bbdnet1339 on 2016/08/08.
  */
 public abstract class BitMutator {
-    protected static final double minimumAttributesCovered = 10.0;
+    protected static final double minimumAttributesCovered = 0.0;
     protected SecureRandom randomGen;
 
     public BitMutator(){

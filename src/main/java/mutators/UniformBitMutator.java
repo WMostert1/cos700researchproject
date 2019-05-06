@@ -10,10 +10,13 @@ import java.util.List;
  *
  */
 public class UniformBitMutator extends BitMutator {
-    private double bitfactor = 0.1;
+    private int numberOfBits = 1;
 
-    public UniformBitMutator(double bitfactor){
-        this.bitfactor = bitfactor;
+    public UniformBitMutator() {
+    }
+
+    public UniformBitMutator(int numberOfBits){
+        this.numberOfBits = numberOfBits;
     }
 
     @Override
@@ -21,7 +24,6 @@ public class UniformBitMutator extends BitMutator {
         List<Integer> mutationIndices = new ArrayList<>();
         int rIndex = randomGen.nextInt(arr.length-1);
 
-        int numberOfBits = (int)bitfactor*arr.length;
         if (numberOfBits < 1)
             numberOfBits = 1;
 
@@ -35,10 +37,12 @@ public class UniformBitMutator extends BitMutator {
         for(Integer i : mutationIndices)
             newArr[i] = !newArr[i];
 
-        if(satisifesMinimumPercentageAttributes(newArr))
-            return newArr;
-        else
-            return mutate(arr);
+        return newArr;
+
+//        if(satisifesMinimumPercentageAttributes(newArr))
+//            return newArr;
+//        else
+//            return mutate(arr);
     }
 
 }
