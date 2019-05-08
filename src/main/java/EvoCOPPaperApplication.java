@@ -19,6 +19,7 @@ import java.util.*;
  *
  */
 public class EvoCOPPaperApplication {
+    /*
     public static final int DECIMAL_PLACES = 8;
     private static void sortIntArr(int [] arr){
         for(int i = 0; i < arr.length; i++){
@@ -121,7 +122,7 @@ public class EvoCOPPaperApplication {
 //        dataSets.add("diabetes");
 //          dataSets.add("zoo");
 
-        OutputFormatter outF = new OutputFormatter("out/test.csv");
+        utils.OutputFormatter outF = new utils.OutputFormatter("out/test.csv");
         List<String> badSets = new ArrayList<>();
         for (String dataSet : dataSets) {
             try {
@@ -130,7 +131,7 @@ public class EvoCOPPaperApplication {
 
                 saveDataSetInfo(new DataSetInfo(dataSet, originalData.numAttributes()-1, originalData.numInstances(), originalData.numClasses()));
 
-                LandscapeEvaluator filterEval = new LandscapeEvaluator(new IBkClassifier());
+                fitness.FitnessEvaluator filterEval = new fitness.FitnessEvaluator(new classifiers.IBkClassifier());
                 Map<ConcreteBinarySolution, Double> fitnessMap = filterEval.eval(originalData);
 
 //                for(ConcreteBinarySolution sol : fitnessMap.keySet()){
@@ -158,13 +159,13 @@ public class EvoCOPPaperApplication {
                 System.out.println("NUMBER OF GLOBAL OPTIMA: "+globalOptima.size());
 
                 System.out.println("Applying filter method");
-                FSBundle filterMethodResult = FeatureSelectorUtils.getFilterMethodAttributes(getDataSet(dataSet), fitnessMap);
+                fs.FeatureSelectionResult filterMethodResult = fs.FeatureSelectorUtils.applyRankerInfoGainFilterMethod(getDataSet(dataSet), fitnessMap);
 //                System.out.println("Applying SFS wrapper method");
-//                FSBundle wrapperMethodResult = FeatureSelectorUtils.getWrapperMethodAttributes(getDataSet(dataSet));
+//                fs.FeatureSelectionResult wrapperMethodResult = fs.FeatureSelectorUtils.getWrapperMethodAttributes(getDataSet(dataSet));
                 System.out.println("Applying GA wrapper method");
-                GAResult wrapperGAMethodResult = FeatureSelectorUtils.getWrapperGAAttributes(getDataSet(dataSet), globalOptima, fitnessMap);
+                fs.GAResult wrapperGAMethodResult = fs.FeatureSelectorUtils.getWrapperGAAttributes(getDataSet(dataSet), globalOptima, fitnessMap);
                 System.out.println("Applying SFS wrapper method");
-                FSBundle wrapperGreedyStepwise = FeatureSelectorUtils.getWrapperGreedyStepwiseAttributes(getDataSet(dataSet), fitnessMap);
+                fs.FeatureSelectionResult wrapperGreedyStepwise = fs.FeatureSelectorUtils.getWrapperGreedyStepwiseAttributes(getDataSet(dataSet), fitnessMap);
 
                 double globalFitness = fitnessMap.get(globalOptima.get(0));
 
@@ -324,7 +325,7 @@ public class EvoCOPPaperApplication {
     private static int dataSetNumber = 0;
 
 
-    private static void buildDataSetInfo(OutputFormatter outF, String name, int noAttrs, int noInstances, int noClasses){
+    private static void buildDataSetInfo(utils.OutputFormatter outF, String name, int noAttrs, int noInstances, int noClasses){
         if(dataSetNumber == 0){
             outF.addAsColumns("Datasets");
             outF.addAsColumns("Index", "Name", "No. Attributes", "No. Instances", "No. Classes");
@@ -365,14 +366,14 @@ public class EvoCOPPaperApplication {
     private static void saveDataSetInfo(DataSetInfo info){
         dataSetReport.add(info);
     }
-    private static void flushDataSetInfo(OutputFormatter outF){
+    private static void flushDataSetInfo(utils.OutputFormatter outF){
         for(DataSetInfo dataSetInfo : dataSetReport){
             buildDataSetInfo(outF, dataSetInfo.getName(), dataSetInfo.getNoAttrs(), dataSetInfo.getNoInstances(), dataSetInfo.getNoClasses());
         }
     }
 
     private static List<String> algorithmNames = Lists.newArrayList();
-    private static void buildFSInfo(OutputFormatter outF, String algorithmName, String dataSetName, int numberOfGlobalOptima,
+    private static void buildFSInfo(utils.OutputFormatter outF, String algorithmName, String dataSetName, int numberOfGlobalOptima,
                                     boolean foundLocalOpt, boolean foundGlobalOpt, double percentageCap, double successRatio, double fsAccuracy, double globalAccuracy){
         if(!algorithmNames.contains(algorithmName)){
             algorithmNames.add(algorithmName);
@@ -458,7 +459,7 @@ public class EvoCOPPaperApplication {
         fsReportInfo.put(reportInfo.getAlgorithmName(), algorithmReport);
     }
 
-    private static void flushFSInfo(OutputFormatter outF){
+    private static void flushFSInfo(utils.OutputFormatter outF){
         for(String algorithmName : fsReportInfo.keySet()){
             for(String dataSetName : fsReportInfo.get(algorithmName).keySet()) {
                 FSReportInfo report = fsReportInfo.get(algorithmName).get(dataSetName);
@@ -469,7 +470,7 @@ public class EvoCOPPaperApplication {
     }
 
 
-//    private static void addLocalOptimaInfoForFeatureSelectionAlgorithm(OutputFormatter outF, String algorithmDescription,
+//    private static void addLocalOptimaInfoForFeatureSelectionAlgorithm(utils.OutputFormatter outF, String algorithmDescription,
 //                                                                       BinarySolution featureSelectionSolution,
 //                                                                       double featureSelectionFitness,
 //                                                                       HashMap<BinarySolution, Double> optimaQuality,
@@ -494,5 +495,5 @@ public class EvoCOPPaperApplication {
 //
 //    }
 
-
+*/
 }
