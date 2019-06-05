@@ -50,9 +50,9 @@ public abstract class GenericRankerFeatureSelection {
             attributes[i] = (int)ranked[i][0];
         }
 
-        if(attributes.length == 1 && attributes[0] == 0){
-            throw new RuntimeException("Can not choose NO features.");
-        }
+//        if(attributes.length == 1 && attributes[0] == 0){
+//            throw new RuntimeException("Can not choose NO features.");
+//        }
 
 
         return new FeatureSelectionResult(FeatureSelectorUtils.getInstancesFromAttributeInclusionIndicesArr(splitter.getTestingSet(), attributes),

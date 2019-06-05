@@ -4,6 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import fitness.FitnessEvaluator;
 import fs.*;
+import fs.pso.BoothFunction;
+import fs.pso.GbestPSO;
+import fs.pso.Particle;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import utils.MathUtils;
 import utils.OutputFormatter;
@@ -12,9 +15,12 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static utils.MathUtils.doubleToBigDecimal;
 
 
 /**
@@ -22,7 +28,6 @@ import java.util.*;
  *
  */
 public class JournalApplication {
-    public static final int DECIMAL_PLACES = 8;
     private static void sortIntArr(int [] arr){
         for(int i = 0; i < arr.length; i++){
             for(int j = 0; j < arr.length; j++){
@@ -97,11 +102,18 @@ public class JournalApplication {
         File folder = new File("./src/main/resources/data-sets/used");
         File[] listOfFiles = folder.listFiles();
         int numberOfDataSets = Integer.MAX_VALUE;
-        for (int i = 0; i < listOfFiles.length && i < numberOfDataSets; i++) {
+        for (int i = 0; i < listOfFiles.length && dataSets.size() < numberOfDataSets; i++) {
             if (listOfFiles[i].isFile()) {
-                    dataSets.add(listOfFiles[i].getName());
+                    String dataSetName = listOfFiles[i].getName();
+                    Instances originalData = getDataSet(dataSetName);
+                    if (originalData.numAttributes() < 10 || originalData.numInstances() > 500){
+                        continue;
+                    }
+                    dataSets.add(dataSetName);
             }
         }
+
+        System.out.println("Using " + dataSets.size() + " data sets.");
 
 
         List<String> badSets = new ArrayList<>();
@@ -114,17 +126,61 @@ public class JournalApplication {
         OutputFormatter outF = new OutputFormatter("out/relative-fs.csv");
         outF.addAsColumns("Dataset", "Feature Selection Algorithm", "Baseline", "Relative Fitness");
 
+        List<FeatureSelectionAlgorithm> algorithms = Lists.newArrayList();
+
+        algorithms.add(new RandomFeatureSelection());
+        algorithms.add(new FullPSOSearchFeatureSelection());
+        algorithms.add(new AMSO());
+        algorithms.add(new RankerInformationGainMethod());
+        algorithms.add(new SequentialForwardSelection());
+        algorithms.add(new RankerPearsonCorrelationMethod());
+        algorithms.add(new CorrelationbasedFeatureSubsetMethod());
+        algorithms.add(new SequentialBackwardSelection());
+        algorithms.add(new GeneticSearchWrapperMethod());
+
+        String [][] bfiTable = new String[dataSets.size() +1][];
+        for(int i = 0; i < bfiTable.length;i++){
+            bfiTable[i] = new String[algorithms.size()+1];
+        }
+
+        for(int i = 1; i < dataSets.size() + 1; i++){
+            bfiTable[i][0] = dataSets.get(i-1);
+        }
+
+        for(int i = 1; i < algorithms.size() + 1; i++){
+            bfiTable[0][i] = algorithms.get(i-1).getAlgorithmName();
+        }
+
+        String [][] fitnessTable = new String[dataSets.size()+1][];
+        for(int i = 0; i < fitnessTable.length; i++){
+            fitnessTable[i] = new String[algorithms.size()+2];
+        }
+
+        for(int i = 1; i < dataSets.size() + 1; i++){
+            fitnessTable[i][0] = dataSets.get(i-1);
+        }
+
+        fitnessTable[0][1] = "Baseline";
+
+        for(int i = 2; i < algorithms.size() + 1; i++){
+            fitnessTable[0][i] = algorithms.get(i-1).getAlgorithmName();
+        }
+
+
+        dataSetNumber = 1;
         for (String dataSet : dataSets) {
 
                 try {
                     Instances originalData = getDataSet(dataSet);
 
+
                     System.out.println("------------  " + dataSet + "  ------------");
                     System.out.println("------------- " + originalData.numAttributes() + " Features --------------");
+                    System.out.println("------------- " + originalData.numInstances() + " Instances ------------");
                     saveDataSetInfo(new DataSetInfo(dataSet, originalData.numAttributes() - 1, originalData.numInstances(), originalData.numClasses()));
 
                     IClassify classifier = new IBkClassifier();
-                    FitnessEvaluator fitnessEvaluator = new FitnessEvaluator(classifier, originalData.numAttributes() - 1, 0.0);
+                    FitnessEvaluator fitnessEvaluator = new FitnessEvaluator(classifier, originalData.numAttributes() - 1);
 //                    Map<ConcreteBinarySolution, Double> fitnessMap = filterEval.eval(originalData);
 
 
@@ -139,70 +195,54 @@ public class JournalApplication {
                     DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
 
                     //ConcreteBinarySolution allFeaturesSelectedSolution = (ConcreteBinarySolution) ConcreteBinarySolution.constructBinarySolution(allFeaturesDesign);
-                    BigDecimal baselineFitness = MathUtils.doubleToBigDecimal(fitnessEvaluator.getQuality(allFeaturesDesign, originalData));
 
-                    List<FeatureSelectionAlgorithm> algorithms = Lists.newArrayList();
-                    algorithms.add(new RankerInformationGainMethod());
-                    algorithms.add(new SequentialForwardSelection());
-                    algorithms.add(new RankerPearsonCorrelationMethod());
-                    algorithms.add(new CorrelationbasedFeatureSubsetMethod());
-                    algorithms.add(new SequentialBackwardSelection());
-                    algorithms.add(new GeneticSearchWrapperMethod());
-
-
+                    BigDecimal baselineFitness = doubleToBigDecimal(fitnessEvaluator.getQuality(allFeaturesDesign, originalData));
+                    fitnessTable[dataSetNumber][1] = baselineFitness.toString();
+                    int algorithmNumber = 1;
                     for(FeatureSelectionAlgorithm fsa : algorithms){
-                        FeatureSelectionResult fsResults = fsa.apply(originalData, fitnessEvaluator);
-                        BigDecimal fitness = MathUtils.doubleToBigDecimal(fsResults.getAccuracy()).subtract(baselineFitness).divide(BigDecimal.valueOf(2.0), MathUtils.ROUNDING_MODE);
-                        descriptiveStatistics.addValue(fitness.doubleValue());
-                        outF.addAsColumns(dataSet, fsa.getAlgorithmName(), Double.toString(baselineFitness.doubleValue()), Double.toString(fitness.doubleValue()));
-                    }
+                        try {
+                            System.out.println(dataSet + " :: " + fsa.getAlgorithmName() + " :: RUNNING");
+                            FeatureSelectionResult fsResults = fsa.apply(originalData, fitnessEvaluator);
 
-//                    FeatureSelectionAlgorithm rankerInfoGain = new RankerInformationGainMethod();
-//                    FeatureSelectionResult rankerInfoGainMethodResults = rankerInfoGain.apply(originalData, fitnessEvaluator);
-//                    double infoGainFitness = rankerInfoGainMethodResults.getAccuracy() - baselineFitness;
-//                    descriptiveStatistics.addValue(infoGainFitness);
-//                    outF.addAsColumns(dataSet, rankerInfoGain.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(infoGainFitness));
-//
-////                    GeneticSearchWrapperMethod geneticSearchWrapperMethod = new GeneticSearchWrapperMethod();
-////                    FeatureSelectionResult geneticSearchWrapperResults = geneticSearchWrapperMethod.apply(originalData, fitnessEvaluator);
-////                    double geneticSearchFitness = geneticSearchWrapperResults.getAccuracy() - baselineFitness;
-////                    descriptiveStatistics.addValue(geneticSearchFitness);
-////                    outF.addAsColumns(dataSet, geneticSearchWrapperMethod.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(geneticSearchFitness));
-//
-//                    SequentialForwardSelection sequentialForwardSelection = new SequentialForwardSelection();
-//                    FeatureSelectionResult greedyStepwiseWrapperResult = sequentialForwardSelection.apply(originalData, fitnessEvaluator);
-//                    double greedyStepwiseFitness = greedyStepwiseWrapperResult.getAccuracy() - baselineFitness;
-//                    descriptiveStatistics.addValue(greedyStepwiseFitness);
-//                    outF.addAsColumns(dataSet, sequentialForwardSelection.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(greedyStepwiseFitness));
-//
-////                    RankerPrincipalComponentsMethod rankerPrincipalComponentsMethod = new RankerPrincipalComponentsMethod();
-////                    FeatureSelectionResult principalComponentsResult = rankerPrincipalComponentsMethod.apply(originalData, fitnessEvaluator);
-////                    double pcaFitness = principalComponentsResult.getAccuracy() - baselineFitness;
-////                    descriptiveStatistics.addValue(pcaFitness);
-////                    outF.addAsColumns(dataSet, rankerPrincipalComponentsMethod.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(pcaFitness));
-//
-//                    RankerPearsonCorrelationMethod rankerPearsonCorrelationMethod = new RankerPearsonCorrelationMethod();
-//                    FeatureSelectionResult correlationPearsonResult = rankerPearsonCorrelationMethod.apply(originalData, fitnessEvaluator);
-//                    double correlationPearsonFitness = correlationPearsonResult.getAccuracy() - baselineFitness;
-//                    descriptiveStatistics.addValue(correlationPearsonFitness);
-//                    outF.addAsColumns(dataSet, rankerPearsonCorrelationMethod.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(correlationPearsonFitness));
-//
-//                    CorrelationbasedFeatureSubsetMethod correlationbasedFeatureSubsetMethod = new CorrelationbasedFeatureSubsetMethod();
-//                    FeatureSelectionResult intercorrelationResult = correlationbasedFeatureSubsetMethod.apply(originalData, fitnessEvaluator);
-//                    double correlationSubsetFitness = intercorrelationResult.getAccuracy() - baselineFitness;
-//                    descriptiveStatistics.addValue(correlationSubsetFitness);
-//                    outF.addAsColumns(dataSet, correlationbasedFeatureSubsetMethod.getAlgorithmName(), Double.toString(baselineFitness), Double.toString(correlationSubsetFitness));
+                            BigDecimal fitness = doubleToBigDecimal(fsResults.getAccuracy()).subtract(baselineFitness);
+                            descriptiveStatistics.addValue(fitness.doubleValue());
+                            outF.addAsColumns(dataSet, fsa.getAlgorithmName(), Double.toString(baselineFitness.doubleValue()), Double.toString(fitness.doubleValue()));
+                            System.out.println(dataSet + " :: " + fsa.getAlgorithmName() + " :: COMPLETED (" + fitness.toString() + ")");
+                            bfiTable[dataSetNumber][algorithmNumber++] = fitness.toString().replace(".",",");
+                            fitnessTable[dataSetNumber][algorithmNumber] = doubleToBigDecimal(fsResults.getAccuracy()).toString();
+                        }catch (Exception e){
+                            bfiTable[dataSetNumber][algorithmNumber++] = "ERR";
+                            fitnessTable[dataSetNumber][algorithmNumber] = "ERR";
+                            System.err.println(e.getMessage());
+
+                        }
+                    }
 
                     outF.addEmptyRow();
                     outF.addAsColumns("STD DEVIATION", Double.toString(descriptiveStatistics.getStandardDeviation()));
                     outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes()-1));
                     outF.addEmptyRow();
                     outF.addEmptyRow();
+
+
+
                     /*
                         baseline : 0.5
                         fitness: -0.3
                         relative = fitness - baseline
                      */
+
+                    /*
+                        fitness = [ -1, 1 ], -1 means penalised to the max and fscore is 0
+                                              1 means fscore is 1 and 0 penalty since 1 feature selected
+
+                        baseline = 0...1 - (1) [-1; 0]
+
+                        bfi = [ -1 ; 1 ] - [ -1 ; 0 ]
+
+                        [ -1 ; 2]
+                     */
+                    dataSetNumber++;
 
                     outF.save();
                 } catch (Exception e) {
@@ -216,6 +256,17 @@ public class JournalApplication {
                 }
         }
 
+        OutputFormatter bfiOut = new OutputFormatter("out/bfiTable.csv");
+        for (String[] strings : bfiTable) {
+            bfiOut.addAsColumns(strings);
+        }
+        bfiOut.save();
+
+        OutputFormatter fitnessOut = new OutputFormatter("out/fitnessTable.csv");
+        for (String[] strings : fitnessTable) {
+            fitnessOut.addAsColumns(strings);
+        }
+        fitnessOut.save();
 
 
         for (String s : badSets) {

@@ -2,6 +2,7 @@ package fitness;
 
 import classifiers.IClassify;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import exceptions.DataException;
 import fs.FeatureSelectorUtils;
 import lons.examples.ConcreteBinarySolution;
@@ -34,23 +35,32 @@ public class FitnessEvaluator {
     private ExecutorService es = Executors.newCachedThreadPool();
     private boolean multiThread = false;
     private final BigDecimal initialNumberOfAttributes;
-    private final BigDecimal penaltyRatio;
-
-    public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes, double penaltyVal){
+    private Map<String, Double> fitnessCache = Maps.newHashMap();
+    private final static Double WORST_FITNESS = -1.0;
+    public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes){
         this.classifier = classifier;
         this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double)originalNumberOfAttributes);
-        this.penaltyRatio = MathUtils.doubleToBigDecimal(penaltyVal);
     }
 
     public FitnessEvaluator(IClassify classifier, boolean multiThread, int originalNumberOfAttributes, double penaltyVal){
         this.multiThread = multiThread;
         this.classifier = classifier;
         this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double)originalNumberOfAttributes);;
-        this.penaltyRatio = MathUtils.doubleToBigDecimal(penaltyVal);
     }
 
     //Baseline Fitness Improvement
     public Double getQuality(boolean [] solution, Instances data) throws Exception {
+        String key = FeatureSelectorUtils.booleanArrayToBitString(solution);
+        if(!key.contains("1")){
+            //No features exist, return -1.0
+            return WORST_FITNESS;
+        }
+
+        Double cachedFitness = fitnessCache.get(key);
+        if(cachedFitness != null){
+            return cachedFitness;
+        }
+
         Instances currentInstances = FeatureSelectorUtils.getInstancesFromBitString(data, solution);
         DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(currentInstances, PERCENTAGE_SPLIT);
         Instances trainingSet = splitter.getTrainingSet();
@@ -70,7 +80,9 @@ public class FitnessEvaluator {
         BigDecimal exponent = (numberOfAttributes.subtract(BigDecimal.ONE)).divide(initialNumberOfAttributes.subtract(BigDecimal.ONE), MathUtils.ROUNDING_MODE);
         BigDecimal penalty = BigDecimal.valueOf(Math.pow(10.0, exponent.doubleValue())).subtract(BigDecimal.ONE).divide(BigDecimal.valueOf(9.0), MathUtils.ROUNDING_MODE);
 
-        return classifierAccuracy.subtract(penalty).doubleValue();
+        Double fitness =  classifierAccuracy.subtract(penalty).doubleValue();
+        fitnessCache.put(key, fitness);
+        return fitness;
 
     }
 
