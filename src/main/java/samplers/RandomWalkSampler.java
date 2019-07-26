@@ -11,6 +11,13 @@ public class RandomWalkSampler implements SolutionSampler<boolean []> {
     private long stepsTaken = 0;
     private int percent = 1;
 
+    public RandomWalkSampler(BitMutator bitMutator, int numAttributes, int dimensionMulitplier) {
+        this.bitMutator = bitMutator;
+        this.numberOfAttributes = numAttributes;
+        this.stepsAllowed = numAttributes*dimensionMulitplier;
+        System.out.println("Doing step count: "+ stepsAllowed);
+    }
+
     public RandomWalkSampler(BitMutator bitMutator, int numAttributes, double stepPercentage) {
         this.bitMutator = bitMutator;
         this.numberOfAttributes = numAttributes;
@@ -48,5 +55,9 @@ public class RandomWalkSampler implements SolutionSampler<boolean []> {
         this.currentPoint = null;
         this.stepsTaken = 0;
         this.percent = 1;
+    }
+
+    public long getStepsTaken() {
+        return stepsTaken;
     }
 }

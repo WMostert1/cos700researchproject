@@ -35,6 +35,7 @@ public class OutputFormatter {
         nextRow();
     }
 
+
     public void save() throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(fileName, "UTF-8");
         writer.write(csvString);

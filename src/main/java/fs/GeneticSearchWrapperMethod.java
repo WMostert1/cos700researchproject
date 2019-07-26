@@ -6,27 +6,30 @@ import lons.examples.BinarySolution;
 import lons.examples.ConcreteBinarySolution;
 import utils.DataSetInstanceSplitter;
 import utils.GlobalConstants;
+import utils.MathUtils;
 import weka.attributeSelection.GeneticSearch;
 import weka.core.Instances;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 
 import static fs.FeatureSelectorUtils.convertAttributeIndexArrayToBinarySolutionFormat;
 import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
-public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm {
+public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm, StochasticFeatureSelection {
     private final int GA_RUNS;
     private static SecureRandom random = new SecureRandom();
+    private ArrayList<BigDecimal> iterationFitnessValues = Lists.newArrayList();
 
     public GeneticSearchWrapperMethod(int numberOfRuns){
         this.GA_RUNS = numberOfRuns;
     }
 
     public GeneticSearchWrapperMethod() {
-        this(10);
+        this(30);
     }
 
     @Override
@@ -67,6 +70,9 @@ public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm {
                 }
             }
 
+            iterationFitnessValues.clear();
+            bundles.forEach((b)-> iterationFitnessValues.add(MathUtils.doubleToBigDecimal(b.getAccuracy())));
+
             double meanAccuracy = 0.0;
             for(FeatureSelectionResult bundle : bundles){
                 meanAccuracy += bundle.getAccuracy();
@@ -90,5 +96,10 @@ public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm {
     @Override
     public String getAlgorithmName() {
         return "Genetic Search Wrapper Method";
+    }
+
+    @Override
+    public ArrayList<BigDecimal> getIterationFitnessValues() {
+        return iterationFitnessValues;
     }
 }

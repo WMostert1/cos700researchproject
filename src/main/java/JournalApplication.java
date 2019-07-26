@@ -7,7 +7,9 @@ import fs.*;
 import fs.pso.BoothFunction;
 import fs.pso.GbestPSO;
 import fs.pso.Particle;
+import landscape.NeutralityMeasure;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.util.Pair;
 import utils.MathUtils;
 import utils.OutputFormatter;
 import weka.core.Instances;
@@ -91,17 +93,13 @@ public class JournalApplication {
         return ret+"]";
     }
 
-    private static final String VOWEL = "vowel";
-    private static final String BREAST_W = "breast-w";
-    private static final String ZOO = "zoo";
-
     public static void main(String [] args) throws Exception {
         List<String> dataSets = new ArrayList<>();
         boolean moveToErrorFolder = false;
 
         File folder = new File("./src/main/resources/data-sets/used");
         File[] listOfFiles = folder.listFiles();
-        int numberOfDataSets = Integer.MAX_VALUE;
+        int numberOfDataSets = 5;//Integer.MAX_VALUE;
         for (int i = 0; i < listOfFiles.length && dataSets.size() < numberOfDataSets; i++) {
             if (listOfFiles[i].isFile()) {
                     String dataSetName = listOfFiles[i].getName();
@@ -124,17 +122,18 @@ public class JournalApplication {
         }
 
         OutputFormatter outF = new OutputFormatter("out/relative-fs.csv");
+        OutputFormatter outStats = new OutputFormatter("out/stats.csv");
         outF.addAsColumns("Dataset", "Feature Selection Algorithm", "Baseline", "Relative Fitness");
 
         List<FeatureSelectionAlgorithm> algorithms = Lists.newArrayList();
 
         algorithms.add(new RandomFeatureSelection());
-        algorithms.add(new FullPSOSearchFeatureSelection());
+        //algorithms.add(new FullPSOSearchFeatureSelection());
         algorithms.add(new AMSO());
         algorithms.add(new RankerInformationGainMethod());
         algorithms.add(new SequentialForwardSelection());
         algorithms.add(new RankerPearsonCorrelationMethod());
-        algorithms.add(new CorrelationbasedFeatureSubsetMethod());
+        //algorithms.add(new CorrelationbasedFeatureSubsetMethod());
         algorithms.add(new SequentialBackwardSelection());
         algorithms.add(new GeneticSearchWrapperMethod());
 
@@ -166,8 +165,11 @@ public class JournalApplication {
             fitnessTable[0][i] = algorithms.get(i-1).getAlgorithmName();
         }
 
+        NeutralityMeasure neutralityMeasure = new NeutralityMeasure();
 
         dataSetNumber = 1;
+
+        Map<String, ArrayList<BigDecimal>>  statsValues = new HashMap<>();
         for (String dataSet : dataSets) {
 
                 try {
@@ -181,7 +183,7 @@ public class JournalApplication {
 
                     IClassify classifier = new IBkClassifier();
                     FitnessEvaluator fitnessEvaluator = new FitnessEvaluator(classifier, originalData.numAttributes() - 1);
-//                    Map<ConcreteBinarySolution, Double> fitnessMap = filterEval.eval(originalData);
+//                  Map<ConcreteBinarySolution, Double> fitnessMap = filterEval.eval(originalData);
 
 
                     //Get the baseline fitness value
@@ -200,13 +202,15 @@ public class JournalApplication {
                     fitnessTable[dataSetNumber][1] = baselineFitness.toString();
                     int algorithmNumber = 1;
                     for(FeatureSelectionAlgorithm fsa : algorithms){
+
                         try {
                             System.out.println(dataSet + " :: " + fsa.getAlgorithmName() + " :: RUNNING");
                             FeatureSelectionResult fsResults = fsa.apply(originalData, fitnessEvaluator);
-
                             BigDecimal fitness = doubleToBigDecimal(fsResults.getAccuracy()).subtract(baselineFitness);
                             descriptiveStatistics.addValue(fitness.doubleValue());
-                            outF.addAsColumns(dataSet, fsa.getAlgorithmName(), Double.toString(baselineFitness.doubleValue()), Double.toString(fitness.doubleValue()));
+
+                            outF.addAsColumns(dataSet, fsa.getAlgorithmName(), Double.toString(baselineFitness.doubleValue()),
+                                    Double.toString(fitness.doubleValue()));
                             System.out.println(dataSet + " :: " + fsa.getAlgorithmName() + " :: COMPLETED (" + fitness.toString() + ")");
                             bfiTable[dataSetNumber][algorithmNumber++] = fitness.toString().replace(".",",");
                             fitnessTable[dataSetNumber][algorithmNumber] = doubleToBigDecimal(fsResults.getAccuracy()).toString();
@@ -214,15 +218,27 @@ public class JournalApplication {
                             bfiTable[dataSetNumber][algorithmNumber++] = "ERR";
                             fitnessTable[dataSetNumber][algorithmNumber] = "ERR";
                             System.err.println(e.getMessage());
+                        }
 
+                        if(fsa instanceof StochasticFeatureSelection){
+                            ArrayList<BigDecimal> iterationValues = ((StochasticFeatureSelection)fsa).getIterationFitnessValues();
+                            if(!statsValues.containsKey(fsa.getAlgorithmName())){
+                                statsValues.put(fsa.getAlgorithmName(), iterationValues);
+                            }else{
+                                statsValues.get(fsa.getAlgorithmName()).addAll(iterationValues);
+                            }
                         }
                     }
 
                     outF.addEmptyRow();
                     outF.addAsColumns("STD DEVIATION", Double.toString(descriptiveStatistics.getStandardDeviation()));
                     outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes()-1));
+
+                    Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
+                    outF.addAsColumns("NEUTRAILITY (m1,m2)",neatraility.getFirst().toString(), neatraility.getSecond().toString());
                     outF.addEmptyRow();
                     outF.addEmptyRow();
+
 
 
 
@@ -254,7 +270,18 @@ public class JournalApplication {
                     System.err.println("Skipping " + dataSet + " and moved to error folder.");
                     badSets.add(dataSet);
                 }
+
+
+
         }
+
+        for(String fsa : statsValues.keySet()){
+            List<String> vals = Lists.newArrayList();
+            statsValues.get(fsa).forEach((v)-> vals.add(v.toString()));
+            vals.add(0, fsa);
+            outStats.addAsColumns(vals.toArray(new String[vals.size()]));
+        }
+        outStats.save();
 
         OutputFormatter bfiOut = new OutputFormatter("out/bfiTable.csv");
         for (String[] strings : bfiTable) {

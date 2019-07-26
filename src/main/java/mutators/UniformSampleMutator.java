@@ -14,9 +14,9 @@ public class UniformSampleMutator extends BitMutator {
             newArr[i] = randomGen.nextBoolean();
         }
         newArr[i] = true;
-        if(satisifesMinimumPercentageAttributes(newArr))
+        //if(satisifesMinimumPercentageAttributes(newArr))
             return newArr;
-        else
-            return mutate(arr);
+//        else
+//            return mutate(arr);
     }
 }

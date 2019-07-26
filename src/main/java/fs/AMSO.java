@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import fitness.FitnessEvaluator;
 import fs.pso.*;
 import lons.examples.ConcreteBinarySolution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import weka.attributeSelection.Ranker;
 import weka.attributeSelection.SymmetricalUncertAttributeEval;
 import weka.core.Instances;
@@ -13,18 +14,21 @@ import weka.filters.unsupervised.attribute.Remove;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
-public class AMSO implements FeatureSelectionAlgorithm {
+public class AMSO implements FeatureSelectionAlgorithm, StochasticFeatureSelection {
     private int numberOfSubSwarms = 3;
     private int populationSize = 50;
     private BigDecimal c = BigDecimal.valueOf(1.49445);
     private int numberOfIteration = 100;
     int subSwarmSize = populationSize/numberOfSubSwarms;
     int betaSubswarmUpdatingTHreshold = 7;
+    private static final int NO_RUNS = 30;
+    private ArrayList<BigDecimal> iterationFitnessValues = Lists.newArrayList();
 
     @Override
     public FeatureSelectionResult apply(Instances data, FitnessEvaluator fitnessEvaluator) throws Exception {
-
+        iterationFitnessValues.clear();
         //Start by ranking features based on symmetrical uncertainty
         SymmetricalUncertAttributeEval symmetricalUncertAttributeEval = new SymmetricalUncertAttributeEval();
         symmetricalUncertAttributeEval.buildEvaluator(data);
@@ -33,70 +37,85 @@ public class AMSO implements FeatureSelectionAlgorithm {
         double [][] ranked = ranker.rankedAttributes();
         int numberOfAttributes = data.numAttributes() - 1;
 
+        DescriptiveStatistics stats = new DescriptiveStatistics();
 
-        ArrayList<AMSOSubswarm> subSwarms = Lists.newArrayList();
+        List<FeatureSelectionResult> fsResults = Lists.newArrayList();
+        FeatureSelectionResult bestFsResult = null;
 
-        for(int i = 0; i < numberOfSubSwarms; i++) {
-            //Contains only features relevant to the sub swarm
-            int [] columnsToRemove = getColumnIndicesToRemove(data, ranked, numberOfAttributes, i + 1);
-            Instances subPopulationFeatures = getSubSetFeaturesBasedOnSubPoluation(data, columnsToRemove);
-            //Subswarm size
-            ParticleFitnessCalculator fitnessCalculator = new KnnParticleFitnessCalculator(fitnessEvaluator, subPopulationFeatures);
-            subSwarms.add(new AMSOSubswarm(fitnessCalculator,
-                            numberOfAttributes,
-                            subSwarmSize,
-                            BigDecimal.ZERO,
-                            BigDecimal.ONE,
-                            numberOfIteration,
-                            c,
-                            columnsToRemove));
-        }
+        for(int runNo = 0; runNo < NO_RUNS; runNo++) {
+            ArrayList<AMSOSubswarm> subSwarms = Lists.newArrayList();
 
-        int countSinceLastIncrease = 0;
-        Particle previousGbest = null;
-        for(int iteration = 0; iteration < numberOfIteration; iteration++){
-
-            ArrayList<Particle> subswarmGbests = Lists.newArrayList();
-            for(AMSOSubswarm subSwarm : subSwarms){
-                subswarmGbests.add(subSwarm.optimize());
+            for (int i = 0; i < numberOfSubSwarms; i++) {
+                //Contains only features relevant to the sub swarm
+                int[] columnsToRemove = getColumnIndicesToRemove(data, ranked, numberOfAttributes, i + 1);
+                Instances subPopulationFeatures = getSubSetFeaturesBasedOnSubPoluation(data, columnsToRemove);
+                //Subswarm size
+                ParticleFitnessCalculator fitnessCalculator = new KnnParticleFitnessCalculator(fitnessEvaluator, subPopulationFeatures);
+                subSwarms.add(new AMSOSubswarm(fitnessCalculator,
+                        numberOfAttributes,
+                        subSwarmSize,
+                        BigDecimal.ZERO,
+                        BigDecimal.ONE,
+                        numberOfIteration,
+                        c,
+                        columnsToRemove));
             }
 
-            //Sort descending
-            subswarmGbests.sort((o1, o2) -> -1 * o1.getFitness().compareTo(o2.getFitness()));
+            int countSinceLastIncrease = 0;
+            Particle previousGbest = null;
+            for (int iteration = 0; iteration < numberOfIteration; iteration++) {
 
-            Particle gbestParticle = subswarmGbests.get(0);
+                ArrayList<Particle> subswarmGbests = Lists.newArrayList();
+                for (AMSOSubswarm subSwarm : subSwarms) {
+                    subswarmGbests.add(subSwarm.optimize());
+                }
 
-            if(previousGbest == null){
-                previousGbest = gbestParticle.clone();
-            }else if (gbestParticle.getFitness().compareTo(previousGbest.getFitness()) > 0){
-                countSinceLastIncrease = 0;
-                previousGbest = gbestParticle.clone();
-            }else{
-                countSinceLastIncrease++;
-            }
-            //Do subswarm updating
-            if(countSinceLastIncrease >= betaSubswarmUpdatingTHreshold){
-               int newMaxLength = previousGbest.getEnabledDimensions();
+                //Sort descending
+                subswarmGbests.sort((o1, o2) -> -1 * o1.getFitness().compareTo(o2.getFitness()));
+
+                Particle gbestParticle = subswarmGbests.get(0);
+
+                if (previousGbest == null) {
+                    previousGbest = gbestParticle.clone();
+                } else if (gbestParticle.getFitness().compareTo(previousGbest.getFitness()) > 0) {
+                    countSinceLastIncrease = 0;
+                    previousGbest = gbestParticle.clone();
+                } else {
+                    countSinceLastIncrease++;
+                }
+                //Do subswarm updating
+                if (countSinceLastIncrease >= betaSubswarmUpdatingTHreshold) {
+                    int newMaxLength = previousGbest.getEnabledDimensions();
 
 
-               subSwarms.sort(Comparator.comparingInt(AMSOSubswarm::getEnabledDimensionsLength));
-                for(int subSwarmNo = 0; subSwarmNo < numberOfSubSwarms; subSwarmNo++) {
-                    AMSOSubswarm subswarm = subSwarms.get(subSwarmNo);
-                    if(subswarm.getEnabledDimensionsLength() == newMaxLength){
-                        continue;
+                    subSwarms.sort(Comparator.comparingInt(AMSOSubswarm::getEnabledDimensionsLength));
+                    for (int subSwarmNo = 0; subSwarmNo < numberOfSubSwarms; subSwarmNo++) {
+                        AMSOSubswarm subswarm = subSwarms.get(subSwarmNo);
+                        if (subswarm.getEnabledDimensionsLength() == newMaxLength) {
+                            continue;
+                        }
+
+                        int[] columnsToRemove = getColumnIndicesToRemove(data, ranked, newMaxLength, subSwarmNo + 1);
+                        Instances newData = getSubSetFeaturesBasedOnSubPoluation(data, columnsToRemove);
+                        subSwarms.get(subSwarmNo).subswarmUpdate(columnsToRemove, new KnnParticleFitnessCalculator(fitnessEvaluator, newData), newData.numAttributes() - 1);
                     }
 
-                    int [] columnsToRemove = getColumnIndicesToRemove(data, ranked, newMaxLength, subSwarmNo + 1);
-                    Instances newData = getSubSetFeaturesBasedOnSubPoluation(data, columnsToRemove);
-                    subSwarms.get(subSwarmNo).subswarmUpdate(columnsToRemove, new KnnParticleFitnessCalculator(fitnessEvaluator, newData), newData.numAttributes() -1);
                 }
 
             }
 
+            FeatureSelectionResult fsr = new FeatureSelectionResult(data, previousGbest.getFitness().doubleValue(), ConcreteBinarySolution.constructBinarySolution(KnnParticleFitnessCalculator.dimensionsToBooleanArray(previousGbest)));
+            iterationFitnessValues.add(previousGbest.getFitness());
+            if(bestFsResult == null){
+                bestFsResult = fsr;
+            }else if(bestFsResult.getAccuracy() < fsr.getAccuracy()){
+                bestFsResult = fsr;
+            }
+            fsResults.add(fsr);
+            stats.addValue(fsr.getAccuracy());
         }
 
-
-        return new FeatureSelectionResult(data, previousGbest.getFitness().doubleValue(), ConcreteBinarySolution.constructBinarySolution(KnnParticleFitnessCalculator.dimensionsToBooleanArray(previousGbest)));
+        return new FeatureSelectionResult(bestFsResult.getData(), stats.getMean(), bestFsResult.getBinarySolution());
     }
 
 
@@ -142,5 +161,10 @@ public class AMSO implements FeatureSelectionAlgorithm {
     @Override
     public String getAlgorithmName() {
         return "AMSO Feature Selection";
+    }
+
+    @Override
+    public ArrayList<BigDecimal> getIterationFitnessValues() {
+        return iterationFitnessValues;
     }
 }
