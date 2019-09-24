@@ -1,0 +1,122 @@
+Dataset;Feature Selection Algorithm;Baseline;Relative Fitness
+audiology.arff;Random Feature Selection;-0.49557522;0.64498726
+audiology.arff;AMSO Feature Selection;-0.49557522;1.09015826
+audiology.arff;Ranker Info Gain Filter Method;-0.49557522;1.08071013
+audiology.arff;Sequential Forward Selection;-0.49557522;1.08546473
+audiology.arff;Pearson Correlation Ranker;-0.49557522;1.08122873
+audiology.arff;Sequential Backward Selection;-0.49557522;1.05035643
+audiology.arff;Genetic Search Wrapper Method;-0.49557522;1.03821217
+
+
+STD DEVIATION;0.1621996796416085
+Number of features;69
+autos.arff;Random Feature Selection;-0.69607843;0.75918403
+autos.arff;AMSO Feature Selection;-0.69607843;1.18436703
+autos.arff;Ranker Info Gain Filter Method;-0.69607843;1.05743921
+autos.arff;Sequential Forward Selection;-0.69607843;1.17508627
+autos.arff;Pearson Correlation Ranker;-0.69607843;1.00980392
+autos.arff;Sequential Backward Selection;-0.69607843;1.08970712
+autos.arff;Genetic Search Wrapper Method;-0.69607843;1.1717938
+
+
+STD DEVIATION;0.1500009558749538
+Number of features;25
+flags.arff;Random Feature Selection;-0.45360825;0.68842066
+flags.arff;AMSO Feature Selection;-0.45360825;1.05550663
+flags.arff;Ranker Info Gain Filter Method;-0.45360825;1.02140438
+flags.arff;Sequential Forward Selection;-0.45360825;1.07292033
+flags.arff;Pearson Correlation Ranker;-0.45360825;1.03919695
+flags.arff;Sequential Backward Selection;-0.45360825;1.0166173
+flags.arff;Genetic Search Wrapper Method;-0.45360825;1.05705109
+
+
+STD DEVIATION;0.13580880942898657
+Number of features;29
+hepatitis.arff;Random Feature Selection;-0.32467532;0.75528712
+hepatitis.arff;AMSO Feature Selection;-0.32467532;1.05332401
+hepatitis.arff;Ranker Info Gain Filter Method;-0.32467532;1.0
+hepatitis.arff;Sequential Forward Selection;-0.32467532;1.04552766
+hepatitis.arff;Pearson Correlation Ranker;-0.32467532;1.04977243
+hepatitis.arff;Sequential Backward Selection;-0.32467532;1.01735693
+hepatitis.arff;Genetic Search Wrapper Method;-0.32467532;1.0635106
+
+
+STD DEVIATION;0.1092242857308079
+Number of features;19
+labor.arff;Random Feature Selection;-0.25;0.71829904
+labor.arff;AMSO Feature Selection;-0.25;1.02670104
+labor.arff;Ranker Info Gain Filter Method;-0.25;1.0
+labor.arff;Sequential Forward Selection;-0.25;1.05299364
+labor.arff;Pearson Correlation Ranker;-0.25;1.0
+labor.arff;Sequential Backward Selection;-0.25;1.04865161
+labor.arff;Genetic Search Wrapper Method;-0.25;1.06682081
+
+
+STD DEVIATION;0.12154489721940766
+Number of features;16
+lung-cancer.arff;Random Feature Selection;-0.375;0.737879
+lung-cancer.arff;AMSO Feature Selection;-0.375;1.14756836
+lung-cancer.arff;Ranker Info Gain Filter Method;-0.375;0.99524957
+lung-cancer.arff;Sequential Forward Selection;-0.375;0.9375
+lung-cancer.arff;Pearson Correlation Ranker;-0.375;0.9375
+lung-cancer.arff;Sequential Backward Selection;-0.375;1.09912814
+lung-cancer.arff;Genetic Search Wrapper Method;-0.375;1.16575316
+
+
+STD DEVIATION;0.15031018456083414
+Number of features;56
+lymph.arff;Random Feature Selection;-0.24324324;0.71370734
+lymph.arff;AMSO Feature Selection;-0.24324324;1.00149341
+lymph.arff;Ranker Info Gain Filter Method;-0.24324324;0.98648648
+lymph.arff;Sequential Forward Selection;-0.24324324;1.03299712
+lymph.arff;Pearson Correlation Ranker;-0.24324324;0.99835286
+lymph.arff;Sequential Backward Selection;-0.24324324;1.02821119
+lymph.arff;Genetic Search Wrapper Method;-0.24324324;1.01624149
+
+
+STD DEVIATION;0.11345083278149488
+Number of features;18
+molecular-biology_promoters.arff;Random Feature Selection;-0.71698113;0.73981481
+molecular-biology_promoters.arff;AMSO Feature Selection;-0.71698113;1.11765888
+molecular-biology_promoters.arff;Ranker Info Gain Filter Method;-0.71698113;1.06612216
+molecular-biology_promoters.arff;Sequential Forward Selection;-0.71698113;1.1793297
+molecular-biology_promoters.arff;Pearson Correlation Ranker;-0.71698113;1.07485381
+molecular-biology_promoters.arff;Sequential Backward Selection;-0.71698113;0.60487
+molecular-biology_promoters.arff;Genetic Search Wrapper Method;-0.71698113;1.12000445
+
+
+STD DEVIATION;0.2209258359298721
+Number of features;58
+sonar.arff;Random Feature Selection;-0.97115385;0.76700045
+sonar.arff;AMSO Feature Selection;-0.97115385;1.14339337
+sonar.arff;Ranker Info Gain Filter Method;-0.97115385;1.00961539
+sonar.arff;Sequential Forward Selection;-0.97115385;1.15903949
+sonar.arff;Pearson Correlation Ranker;-0.97115385;1.02442411
+sonar.arff;Sequential Backward Selection;-0.97115385;0.9065997
+sonar.arff;Genetic Search Wrapper Method;-0.97115385;1.08254514
+
+
+STD DEVIATION;0.13853091385686747
+Number of features;60
+sponge.arff;Random Feature Selection;-0.15789474;0.7550321
+sponge.arff;AMSO Feature Selection;-0.15789474;0.99960204
+sponge.arff;Ranker Info Gain Filter Method;-0.15789474;1.0
+sponge.arff;Sequential Forward Selection;-0.15789474;1.0
+sponge.arff;Pearson Correlation Ranker;-0.15789474;1.0
+sponge.arff;Sequential Backward Selection;-0.15789474;1.0
+sponge.arff;Genetic Search Wrapper Method;-0.15789474;0.99919338
+
+
+STD DEVIATION;0.09251379271163296
+Number of features;45
+zoo.arff;Random Feature Selection;-0.18;0.68935425
+zoo.arff;AMSO Feature Selection;-0.18;0.9483597
+zoo.arff;Ranker Info Gain Filter Method;-0.18;0.92294206
+zoo.arff;Sequential Forward Selection;-0.18;0.942802
+zoo.arff;Pearson Correlation Ranker;-0.18;0.82762514
+zoo.arff;Sequential Backward Selection;-0.18;0.90762514
+zoo.arff;Genetic Search Wrapper Method;-0.18;0.94269436
+
+
+STD DEVIATION;0.09502489176793075
+Number of features;17
