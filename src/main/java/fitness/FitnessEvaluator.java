@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import exceptions.DataException;
 import fs.FeatureSelectorUtils;
+import landscape.FitnessDistributionMeasure;
 import lons.examples.ConcreteBinarySolution;
 import samplers.ExhaustiveSampler;
 import samplers.SolutionSampler;
@@ -37,6 +38,7 @@ public class FitnessEvaluator {
     private final BigDecimal initialNumberOfAttributes;
     private Map<String, Double> fitnessCache = Maps.newHashMap();
     private final static Double WORST_FITNESS = -1.0;
+
     public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes){
         this.classifier = classifier;
         this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double)originalNumberOfAttributes);
@@ -85,6 +87,9 @@ public class FitnessEvaluator {
         return fitness;
 
     }
+
+
+
 
     private void calculateFitness(Instances data, Map<ConcreteBinarySolution, Double> fitnessMap) throws Exception {
         //RandomWalkSampler sampler = new RandomWalkSampler(new UniformSampleMutator(), data.numAttributes(), 0.01);
@@ -173,4 +178,7 @@ public class FitnessEvaluator {
 
     }
 
+    public Map<String, Double> getFitnessCache() {
+        return fitnessCache;
+    }
 }

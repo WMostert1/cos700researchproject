@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class AMSO implements FeatureSelectionAlgorithm, StochasticFeatureSelection {
+public class AMSO  extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
     private int numberOfSubSwarms = 3;
     private int populationSize = 50;
     private BigDecimal c = BigDecimal.valueOf(1.49445);
@@ -114,6 +114,7 @@ public class AMSO implements FeatureSelectionAlgorithm, StochasticFeatureSelecti
             fsResults.add(fsr);
             stats.addValue(fsr.getAccuracy());
         }
+
 
         return new FeatureSelectionResult(bestFsResult.getData(), stats.getMean(), bestFsResult.getBinarySolution());
     }

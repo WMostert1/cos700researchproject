@@ -7,6 +7,7 @@ import fs.*;
 import fs.pso.BoothFunction;
 import fs.pso.GbestPSO;
 import fs.pso.Particle;
+import landscape.FitnessDistributionMeasure;
 import landscape.NeutralityMeasure;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.Pair;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import static utils.MathUtils.doubleToBigDecimal;
@@ -99,16 +101,23 @@ public class JournalApplication {
 
         File folder = new File("./src/main/resources/data-sets/used");
         File[] listOfFiles = folder.listFiles();
-        int numberOfDataSets = 5;//Integer.MAX_VALUE;
+        int numberOfDataSets = 20;//Integer.MAX_VALUE;
         for (int i = 0; i < listOfFiles.length && dataSets.size() < numberOfDataSets; i++) {
             if (listOfFiles[i].isFile()) {
                     String dataSetName = listOfFiles[i].getName();
                     Instances originalData = getDataSet(dataSetName);
-                    if (originalData.numAttributes() < 10 || originalData.numInstances() > 500){
+                    if (originalData.numAttributes() < 15 || originalData.numInstances() > 300){
                         continue;
                     }
                     dataSets.add(dataSetName);
             }
+        }
+
+        File directory = new File("out/fitness");
+        if (! directory.exists()){
+            directory.mkdir();
+            // If you require it to make the entire directory path including parents,
+            // use directory.mkdirs(); here instead.
         }
 
         System.out.println("Using " + dataSets.size() + " data sets.");
@@ -123,6 +132,9 @@ public class JournalApplication {
 
         OutputFormatter outF = new OutputFormatter("out/relative-fs.csv");
         OutputFormatter outStats = new OutputFormatter("out/stats.csv");
+        OutputFormatter outNeutrality = new OutputFormatter("out/neutrality.csv");
+        OutputFormatter outRuggedness = new OutputFormatter("out/rugedness.csv");
+        OutputFormatter outFitnessFrequency = new OutputFormatter("out/fitnessfrequency.csv");
         outF.addAsColumns("Dataset", "Feature Selection Algorithm", "Baseline", "Relative Fitness");
 
         List<FeatureSelectionAlgorithm> algorithms = Lists.newArrayList();
@@ -201,6 +213,7 @@ public class JournalApplication {
                     BigDecimal baselineFitness = doubleToBigDecimal(fitnessEvaluator.getQuality(allFeaturesDesign, originalData));
                     fitnessTable[dataSetNumber][1] = baselineFitness.toString();
                     int algorithmNumber = 1;
+
                     for(FeatureSelectionAlgorithm fsa : algorithms){
 
                         try {
@@ -222,6 +235,14 @@ public class JournalApplication {
 
                         if(fsa instanceof StochasticFeatureSelection){
                             ArrayList<BigDecimal> iterationValues = ((StochasticFeatureSelection)fsa).getIterationFitnessValues();
+                            File dsDirectory = new File("out/fitness/"+dataSet);
+                            if (! dsDirectory.exists()){
+                                dsDirectory.mkdir();
+                                // If you require it to make the entire directory path including parents,
+                                // use directory.mkdirs(); here instead.
+                            }
+                            OutputFormatter outputFormatter = new OutputFormatter("out/fitness/"+dataSet+"/"+fsa.getClass().getSimpleName()+".csv");
+                            ((StochasticFeatureSelection)fsa).recordFitnessValues(outputFormatter, iterationValues);
                             if(!statsValues.containsKey(fsa.getAlgorithmName())){
                                 statsValues.put(fsa.getAlgorithmName(), iterationValues);
                             }else{
@@ -230,14 +251,30 @@ public class JournalApplication {
                         }
                     }
 
+                    //Measures specific to dataset
+                    System.out.println("Calculating fitness landscape characteristics...");
                     outF.addEmptyRow();
                     outF.addAsColumns("STD DEVIATION", Double.toString(descriptiveStatistics.getStandardDeviation()));
                     outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes()-1));
 
+                    System.out.println("Calculating neutrality...");
                     Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
-                    outF.addAsColumns("NEUTRAILITY (m1,m2)",neatraility.getFirst().toString(), neatraility.getSecond().toString());
-                    outF.addEmptyRow();
-                    outF.addEmptyRow();
+                    outNeutrality.addAsColumns(dataSet,neatraility.getFirst().toString(), neatraility.getSecond().toString());
+
+                    System.out.println("Calculating fitness distribution...");
+                    FitnessDistributionMeasure fitnessDistributionMeasure = new FitnessDistributionMeasure(20,-1.0,1.0,20);
+                    Map<Integer, Map<boolean[], Double>> fitnessDistro = fitnessDistributionMeasure.get(originalData, fitnessEvaluator);
+                    outFitnessFrequency.addAsColumns(dataSet);
+                    DecimalFormat f = new DecimalFormat("0.00");
+                    for(int i = 0; i < 20;i++){
+                        String key = f.format((-1.0 + (0.1 * i)))+"<=f(s)<"+f.format(-1.0 + (0.1 * (i+1)));
+                        key = key.replace(",", ".");
+                        outFitnessFrequency.addAsColumns(key, Integer.toString(fitnessDistro.get(i).keySet().size()));
+                    }
+
+
+
+
 
 
 
@@ -261,6 +298,8 @@ public class JournalApplication {
                     dataSetNumber++;
 
                     outF.save();
+                    outNeutrality.save();
+                    outFitnessFrequency.save();
                 } catch (Exception e) {
                     if(moveToErrorFolder) {
                         Files.move(Paths.get("./src/main/resources/data-sets/used/" + dataSet), Paths.get("./src/main/resources/data-sets/error/" + dataSet));

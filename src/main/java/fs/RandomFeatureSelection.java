@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-public class RandomFeatureSelection implements FeatureSelectionAlgorithm, StochasticFeatureSelection {
+public class RandomFeatureSelection extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
 
     private final int NO_RUNS = 30;
     private final SecureRandom random = new SecureRandom();
@@ -20,6 +20,7 @@ public class RandomFeatureSelection implements FeatureSelectionAlgorithm, Stocha
 
     @Override
     public FeatureSelectionResult apply(Instances data, FitnessEvaluator fitnessEvaluator) throws Exception {
+
         iterationFitnessValues.clear();
         Double bestFitness = null;
         boolean [] bestSolution = null;
@@ -40,10 +41,12 @@ public class RandomFeatureSelection implements FeatureSelectionAlgorithm, Stocha
 
             BigDecimal bdFitness = MathUtils.doubleToBigDecimal(fitness);
 
+
             averageAccuracy = averageAccuracy.add(bdFitness);
             iterationFitnessValues.add(bdFitness);
 
         }
+
 
          averageAccuracy = averageAccuracy.divide(BigDecimal.valueOf(NO_RUNS), MathUtils.ROUNDING_MODE);
         return new FeatureSelectionResult(data, averageAccuracy.doubleValue(), ConcreteBinarySolution.constructBinarySolution(bestSolution));

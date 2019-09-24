@@ -19,7 +19,7 @@ import java.util.List;
 import static fs.FeatureSelectorUtils.convertAttributeIndexArrayToBinarySolutionFormat;
 import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
-public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm, StochasticFeatureSelection {
+public class GeneticSearchWrapperMethod extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
     private final int GA_RUNS;
     private static SecureRandom random = new SecureRandom();
     private ArrayList<BigDecimal> iterationFitnessValues = Lists.newArrayList();
@@ -74,6 +74,7 @@ public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm, St
             bundles.forEach((b)-> iterationFitnessValues.add(MathUtils.doubleToBigDecimal(b.getAccuracy())));
 
             double meanAccuracy = 0.0;
+
             for(FeatureSelectionResult bundle : bundles){
                 meanAccuracy += bundle.getAccuracy();
             }
@@ -86,7 +87,6 @@ public class GeneticSearchWrapperMethod implements FeatureSelectionAlgorithm, St
 //            BigDecimal bdSuccessRatio = new BigDecimal(successCount/(double)GA_RUNS);
 //            bdSuccessRatio = bdSuccessRatio.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_UP);
             bestBundle.setAccuracy(bdMeanAccuracy.doubleValue());
-
             return bestBundle;
             //return new GAResult(bestBundle, bdMeanAccuracy.doubleValue(), bdSuccessRatio.doubleValue());
 

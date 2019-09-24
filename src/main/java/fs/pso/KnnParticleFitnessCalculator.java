@@ -1,8 +1,6 @@
 package fs.pso;
 
 import fitness.FitnessEvaluator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import utils.MathUtils;
 import weka.core.Instances;
 
 import java.math.BigDecimal;
