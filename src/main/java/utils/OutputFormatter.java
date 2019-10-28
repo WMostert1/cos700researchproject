@@ -3,42 +3,54 @@ package utils;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+
+import static utils.GlobalConstants.REPORTED_DECIMAL_PLACES;
+import static utils.MathUtils.bigDecimalToString;
+import static utils.MathUtils.doubleToString;
 
 /**
  * Created by bbdnet1339 on 2016/08/12.
  */
-public class OutputFormatter {
-    private String fileName;
+public abstract class OutputFormatter {
 
-    public OutputFormatter(String fileName) {
+    protected String fileName;
+    protected String outputString;
+    protected final int numberOfColumns;
+
+    public OutputFormatter(String fileName, String... headers) {
         this.fileName = fileName;
-        csvString = "";
+        this.outputString = "";
+        this.numberOfColumns = headers.length;
     }
 
-    //This is for Excel
-    private String csvString;
-
-    public void addEmptyRow(){
-        csvString+="\n\n";
+    protected void append(String val) {
+        this.outputString += val;
     }
 
-    public void nextRow(){
-        csvString += "\n";
+    protected abstract void addHeaders(String... headers);
+
+    public abstract void addEmptyRow();
+
+    public abstract void nextRow();
+
+    public void addAsColumns(Object... vals) {
+        addAsColumns(Arrays.stream(vals).map((val) -> {
+            if (val instanceof BigDecimal) {
+                return bigDecimalToString((BigDecimal) val);
+            }
+            if (val instanceof Double) {
+                return doubleToString((Double) val);
+            }
+            return val.toString();
+        }).toArray(String[]::new));
     }
 
-    public void addAsColumns(String ... vals){
-        int i = 0;
-        for(;i<vals.length-1;i++){
-            csvString += vals[i]+";";
-        }
-        csvString += vals[i];
-        nextRow();
-    }
+    public abstract void addAsColumns(String... vals);
+
+    public abstract void save() throws FileNotFoundException, UnsupportedEncodingException;
 
 
-    public void save() throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-        writer.write(csvString);
-        writer.close();
-    }
 }

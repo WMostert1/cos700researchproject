@@ -27,7 +27,7 @@ public class RandomFeatureSelection extends StochasticFeatureSelection implement
         BigDecimal averageAccuracy = BigDecimal.ZERO;
 
         int numAttributes = data.numAttributes() -1;
-        for(int run = 1; run < NO_RUNS; run++){
+        for(int run = 0; run < NO_RUNS; run++){
             boolean [] solution = new boolean[numAttributes];
             for(int i = 0; i < numAttributes; i++){
                 solution[i] = random.nextBoolean();

@@ -11,6 +11,7 @@ import samplers.ExhaustiveSampler;
 import samplers.SolutionSampler;
 import utils.DataSetInstanceSplitter;
 import utils.MathUtils;
+import weka.core.Attribute;
 import weka.core.Instances;
 
 import java.math.BigDecimal;
@@ -26,7 +27,6 @@ import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
 /**
  * Created by bbdnet1339 on 2016/08/08.
- *
  */
 public class FitnessEvaluator {
 
@@ -38,40 +38,60 @@ public class FitnessEvaluator {
     private final BigDecimal initialNumberOfAttributes;
     private Map<String, Double> fitnessCache = Maps.newHashMap();
     private final static Double WORST_FITNESS = -1.0;
+    private boolean verbose = false;
 
-    public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes){
+    public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes, boolean verbose) {
         this.classifier = classifier;
-        this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double)originalNumberOfAttributes);
+        this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double) originalNumberOfAttributes);
+        this.verbose = verbose;
     }
 
-    public FitnessEvaluator(IClassify classifier, boolean multiThread, int originalNumberOfAttributes, double penaltyVal){
+
+    public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes) {
+        this.classifier = classifier;
+        this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double) originalNumberOfAttributes);
+    }
+
+    public FitnessEvaluator(IClassify classifier, boolean multiThread, int originalNumberOfAttributes, double penaltyVal) {
         this.multiThread = multiThread;
         this.classifier = classifier;
-        this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double)originalNumberOfAttributes);;
+        this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double) originalNumberOfAttributes);
+        ;
     }
 
     //Baseline Fitness Improvement
-    public Double getQuality(boolean [] solution, Instances data) throws Exception {
+    public Double getQuality(boolean[] solution, Instances data) throws Exception {
         String key = FeatureSelectorUtils.booleanArrayToBitString(solution);
-        if(!key.contains("1")){
+        if (!key.contains("1")) {
             //No features exist, return -1.0
             return WORST_FITNESS;
         }
 
         Double cachedFitness = fitnessCache.get(key);
-        if(cachedFitness != null){
+        if (cachedFitness != null) {
             return cachedFitness;
         }
 
         Instances currentInstances = FeatureSelectorUtils.getInstancesFromBitString(data, solution);
+
+        if (verbose) {
+            String attributes = "Using attributes : ";
+            for (int i = 0; i < currentInstances.numAttributes(); i++) {
+                Attribute attr = currentInstances.attribute(i);
+                attributes += attr.name() + ",";
+            }
+            System.out.println(attributes);
+        }
+
         DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(currentInstances, PERCENTAGE_SPLIT);
         Instances trainingSet = splitter.getTrainingSet();
         Instances testingSet = splitter.getTestingSet();
 
         BigDecimal classifierAccuracy = MathUtils.doubleToBigDecimal(classifier.getClassificationAccuracy(trainingSet, testingSet));
-        BigDecimal numberOfAttributes =  MathUtils.doubleToBigDecimal((double)(currentInstances.numAttributes() - 1));
 
-        if(numberOfAttributes.compareTo(initialNumberOfAttributes) > 0){
+        BigDecimal numberOfAttributes = MathUtils.doubleToBigDecimal((double) (currentInstances.numAttributes() - 1));
+
+        if (numberOfAttributes.compareTo(initialNumberOfAttributes) > 0) {
             throw new RuntimeException("Remember to construct this class for each data set");
         }
 
@@ -82,44 +102,49 @@ public class FitnessEvaluator {
         BigDecimal exponent = (numberOfAttributes.subtract(BigDecimal.ONE)).divide(initialNumberOfAttributes.subtract(BigDecimal.ONE), MathUtils.ROUNDING_MODE);
         BigDecimal penalty = BigDecimal.valueOf(Math.pow(10.0, exponent.doubleValue())).subtract(BigDecimal.ONE).divide(BigDecimal.valueOf(9.0), MathUtils.ROUNDING_MODE);
 
-        Double fitness =  classifierAccuracy.subtract(penalty).doubleValue();
+        penalty = penalty.multiply(BigDecimal.valueOf(0.25));
+        Double fitness = classifierAccuracy.subtract(penalty).doubleValue();
+
+        if (verbose) {
+            System.out.println("Classifier accuracy = " + classifierAccuracy.toString());
+            System.out.println("Penalty value = " + penalty.toString());
+            System.out.println("Fitness accuracy = " + fitness.toString());
+        }
         fitnessCache.put(key, fitness);
         return fitness;
 
     }
 
 
-
-
     private void calculateFitness(Instances data, Map<ConcreteBinarySolution, Double> fitnessMap) throws Exception {
         //RandomWalkSampler sampler = new RandomWalkSampler(new UniformSampleMutator(), data.numAttributes(), 0.01);
-        SolutionSampler<boolean []> sampler = new ExhaustiveSampler(data.numAttributes()-1);
-        boolean [] point;
+        SolutionSampler<boolean[]> sampler = new ExhaustiveSampler(data.numAttributes() - 1);
+        boolean[] point;
 
-        do{
+        do {
             point = sampler.getSample();
 
             ConcreteBinarySolution solution = (ConcreteBinarySolution) ConcreteBinarySolution.constructBinarySolution(point);
 
-            if(fitnessMap.get(solution) != null){
+            if (fitnessMap.get(solution) != null) {
                 System.err.println("Found same solution");
                 continue;
             }
 
             fitnessMap.put(solution, getQuality(point, data));
-           // optional
+            // optional
             sampler.showProgress();
         }
-        while(!sampler.isDone());
+        while (!sampler.isDone());
     }
 
     private void calculateFitnessAsync(Instances data, Map<ConcreteBinarySolution, Double> fitnessMap) {
-        SolutionSampler<boolean []> sampler = new ExhaustiveSampler(data.numAttributes()-1);
+        SolutionSampler<boolean[]> sampler = new ExhaustiveSampler(data.numAttributes() - 1);
         List<List<boolean[]>> listOfBatchSolutions = Lists.newArrayList();
-        for(int i = 0 ; i < NUMBER_OF_THREADS; i++){
-            listOfBatchSolutions.add(((ExhaustiveSampler) sampler).getBatchSample((int)(Math.pow(2.0, (double)data.numAttributes()-1)/NUMBER_OF_THREADS)+1));
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+            listOfBatchSolutions.add(((ExhaustiveSampler) sampler).getBatchSample((int) (Math.pow(2.0, (double) data.numAttributes() - 1) / NUMBER_OF_THREADS) + 1));
         }
-        for(List<boolean[]> points : listOfBatchSolutions) {
+        for (List<boolean[]> points : listOfBatchSolutions) {
             es.execute(() -> {
                 for (boolean[] point : points) {
                     ConcreteBinarySolution solution = (ConcreteBinarySolution) ConcreteBinarySolution.constructBinarySolution(point);
@@ -146,10 +171,10 @@ public class FitnessEvaluator {
     protected Map<ConcreteBinarySolution, Double> sampleLandscape(Instances data) throws Exception {
         HashMap<ConcreteBinarySolution, Double> fitnessMap = new HashMap<>();
 
-        if(multiThread){
+        if (multiThread) {
             calculateFitnessAsync(data, fitnessMap);
             this.wait(60);
-        }else{
+        } else {
             calculateFitness(data, fitnessMap);
         }
 
@@ -157,14 +182,13 @@ public class FitnessEvaluator {
     }
 
     public Map<ConcreteBinarySolution, Double> eval(Instances data) throws Exception {
-        if(data.classIndex() == -1){
+        if (data.classIndex() == -1) {
             throw new DataException("Class index for data set is not specified.");
         }
 
-        if(data.numAttributes() > 32){
+        if (data.numAttributes() > 32) {
             throw new DataException("Data sets with more than 31 attributes not currently supported.");
         }
-
 
 
         //At this point it will be a randomly initialised point - initial point
@@ -173,7 +197,7 @@ public class FitnessEvaluator {
 
         fitnessMap = sampleLandscape(data);
 
-        System.out.println("Populated fitness landscape, samples: "+fitnessMap.size());
+        System.out.println("Populated fitness landscape, samples: " + fitnessMap.size());
         return fitnessMap;
 
     }

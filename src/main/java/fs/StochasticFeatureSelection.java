@@ -11,12 +11,12 @@ import java.util.List;
 public abstract class StochasticFeatureSelection {
     abstract public ArrayList<BigDecimal> getIterationFitnessValues();
 
-    public void recordFitnessValues(OutputFormatter outputFormatter, List<BigDecimal> fitness){
+    public void recordFitnessValues(OutputFormatter outputFormatter, List<BigDecimal> fitness, BigDecimal baselineFitness){
         if(fitness == null || fitness.isEmpty() || outputFormatter == null)
             return;
 
         for(BigDecimal d : fitness)
-            outputFormatter.addAsColumns(d.toString());
+            outputFormatter.addAsColumns(d.subtract(baselineFitness).toString());
 
         try {
             outputFormatter.save();
