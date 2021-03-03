@@ -1,78 +1,14 @@
 Dataset;Feature Selection Algorithm;Baseline;Relative Fitness;
-vote,arff;Pearson Correlation Ranker;0,67626728;0,26843318;
-vote,arff;Ranker Info Gain Filter Method;0,67626728;0,26843318;
-vote,arff;Sequential Forward Selection;0,67626728;0,26843318;
-vote,arff;Random Feature Selection;0,67626728;0,1661986;
-vote,arff;Sequential Backward Selection;0,67626728;0,26843318;
-vote,arff;AMSO Feature Selection;0,67626728;0,26843318;
-vote,arff;Genetic Search Wrapper Method;0,67626728;0,26776765;
-
-
-STD DEVIATION;0,038599911580113694;
-Number of features;16;
-lung-cancer,arff;Random Feature Selection;0,375;0,14611751;
-lung-cancer,arff;Ranker Info Gain Filter Method;0,375;0,25057861;
-lung-cancer,arff;Pearson Correlation Ranker;0,375;0,22990803;
-lung-cancer,arff;Sequential Forward Selection;0,375;0,1875;
-lung-cancer,arff;Sequential Backward Selection;0,375;0,36853204;
-lung-cancer,arff;AMSO Feature Selection;0,375;0,41167925;
-lung-cancer,arff;Genetic Search Wrapper Method;0,375;0,46826339;
-
-
-STD DEVIATION;0,12177359007620857;
-Number of features;56;
-primary-tumor,arff;Pearson Correlation Ranker;0,15828402;0,14972951;
-primary-tumor,arff;Ranker Info Gain Filter Method;0,15828402;0,19022566;
-primary-tumor,arff;Random Feature Selection;0,15828402;0,09255011;
-primary-tumor,arff;Sequential Forward Selection;0,15828402;0,22073542;
-primary-tumor,arff;Sequential Backward Selection;0,15828402;0,22246397;
-primary-tumor,arff;AMSO Feature Selection;0,15828402;0,19675028;
-primary-tumor,arff;Genetic Search Wrapper Method;0,15828402;0,22548805;
-
-
-STD DEVIATION;0,04877666858690448;
-Number of features;17;
-heart-c,arff;Ranker Info Gain Filter Method;0,57119205;0,19784599;
-heart-c,arff;Pearson Correlation Ranker;0,57119205;0,19784599;
-heart-c,arff;Random Feature Selection;0,57119205;0,11312699;
-heart-c,arff;Sequential Forward Selection;0,57119205;0,22838113;
-heart-c,arff;Sequential Backward Selection;0,57119205;0,22514096;
-heart-c,arff;AMSO Feature Selection;0,57119205;0,22389811;
-heart-c,arff;Genetic Search Wrapper Method;0,57119205;0,22775718;
-
-
-STD DEVIATION;0,0414474589000743;
-Number of features;13;
-breast-cancer,arff;Pearson Correlation Ranker;0,47027972;0,25;
-breast-cancer,arff;Ranker Info Gain Filter Method;0,47027972;0,23601399;
-breast-cancer,arff;Random Feature Selection;0,47027972;0,19428208;
-breast-cancer,arff;Sequential Forward Selection;0,47027972;0,27033917;
-breast-cancer,arff;Sequential Backward Selection;0,47027972;0,27484335;
-breast-cancer,arff;Genetic Search Wrapper Method;0,47027972;0,26980216;
-breast-cancer,arff;AMSO Feature Selection;0,47027972;0,26956472;
-
-
-STD DEVIATION;0,029081462516602926;
-Number of features;9;
-kdd_synthetic_control,arff;Sequential Forward Selection;-0,25;0,25;
-kdd_synthetic_control,arff;Random Feature Selection;-0,25;0,18589754;
-kdd_synthetic_control,arff;Pearson Correlation Ranker;-0,25;0,25;
-kdd_synthetic_control,arff;Ranker Info Gain Filter Method;-0,25;0,25;
-kdd_synthetic_control,arff;AMSO Feature Selection;-0,25;0,24996378;
-kdd_synthetic_control,arff;Sequential Backward Selection;-0,25;0,25;
-kdd_synthetic_control,arff;Genetic Search Wrapper Method;-0,25;0,24918736;
-
-
-STD DEVIATION;0,024176846236797164;
-Number of features;61;
-sponge,arff;Random Feature Selection;0,59210526;0,18795635;
-sponge,arff;Ranker Info Gain Filter Method;0,59210526;0,25;
-sponge,arff;Pearson Correlation Ranker;0,59210526;0,25;
-sponge,arff;Sequential Forward Selection;0,59210526;0,25;
-sponge,arff;Sequential Backward Selection;0,59210526;0,25;
-sponge,arff;AMSO Feature Selection;0,59210526;0,25;
-sponge,arff;Genetic Search Wrapper Method;0,59210526;0,24939504;
-
-
-STD DEVIATION;0,023413272100271415;
-Number of features;45;
+arcene,arff;Random;0,55;0,20074297;
+arcene,arff;Sequential Forward Selection;0,55;0,38994878;
+arcene,arff;GA;0,55;0,31812499;
+arcene,arff;Pearson Correlation Ranker;0,55;0,2550937;
+arcene,arff;Info Gain Ranker;0,55;0,29899723;
+arcene,arff;AMSO;0,55;0,31056493;
+Hill_Valley_sample,arff;Random;0,28465347;0,20140939;
+Hill_Valley_sample,arff;Info Gain Ranker;0,28465347;0,25922785;
+Hill_Valley_sample,arff;Pearson Correlation Ranker;0,28465347;0,26096719;
+Hill_Valley_sample,arff;Sequential Forward Selection;0,28465347;0,31588126;
+Hill_Valley_sample,arff;Sequential Backward Selection;0,28465347;0,21218153;
+Hill_Valley_sample,arff;AMSO;0,28465347;0,28406959;
+Hill_Valley_sample,arff;GA;0,28465347;0,3137636;

@@ -27,6 +27,6 @@ public class RankerInformationGainMethod extends GenericRankerFeatureSelection i
 
     @Override
     public String getAlgorithmName() {
-        return "Ranker Info Gain Filter Method";
+        return "Info Gain Ranker";
     }
 }

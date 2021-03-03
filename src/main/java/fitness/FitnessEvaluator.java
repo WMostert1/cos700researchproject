@@ -37,8 +37,12 @@ public class FitnessEvaluator {
     private boolean multiThread = false;
     private final BigDecimal initialNumberOfAttributes;
     private Map<String, Double> fitnessCache = Maps.newHashMap();
-    private final static Double WORST_FITNESS = -1.0;
+    private final static Double WORST_FITNESS = 0.0;
     private boolean verbose = false;
+
+    public static final BigDecimal classifierScalingConstant = BigDecimal.valueOf(1.0);
+    public static final BigDecimal penaltyScalingConstant = BigDecimal.valueOf(0.25);
+
 
     public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes, boolean verbose) {
         this.classifier = classifier;
@@ -88,6 +92,7 @@ public class FitnessEvaluator {
         Instances testingSet = splitter.getTestingSet();
 
         BigDecimal classifierAccuracy = MathUtils.doubleToBigDecimal(classifier.getClassificationAccuracy(trainingSet, testingSet));
+        classifierAccuracy = classifierAccuracy.multiply(classifierScalingConstant);
 
         BigDecimal numberOfAttributes = MathUtils.doubleToBigDecimal((double) (currentInstances.numAttributes() - 1));
 
@@ -101,8 +106,8 @@ public class FitnessEvaluator {
         //penalty(nfs) = 1/9 (10^((nfs-1)/(nf-1)) - 1)
         BigDecimal exponent = (numberOfAttributes.subtract(BigDecimal.ONE)).divide(initialNumberOfAttributes.subtract(BigDecimal.ONE), MathUtils.ROUNDING_MODE);
         BigDecimal penalty = BigDecimal.valueOf(Math.pow(10.0, exponent.doubleValue())).subtract(BigDecimal.ONE).divide(BigDecimal.valueOf(9.0), MathUtils.ROUNDING_MODE);
+        penalty = penalty.multiply(penaltyScalingConstant);
 
-        penalty = penalty.multiply(BigDecimal.valueOf(0.25));
         Double fitness = classifierAccuracy.subtract(penalty).doubleValue();
 
         if (verbose) {

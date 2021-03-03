@@ -1,3 +1,2 @@
-
-null;0,37500000;0,53955172;0,78859340;0,62557861;0,56250000;0,60490803;0,74353204;0,82687385;
-lung-cancer,arff;null;null;null;null;null;null;null;null;
+Baseline;;Random;AMSO;GA;Sequential Backward Selection;Sequential Forward Selection;Pearson Correlation Ranker;Info Gain Ranker;
+Hill_Valley_sample,arff;0,28465347;0,4858;0,5686;0,5962;0,4968;0,6005;0,5456;0,5439;

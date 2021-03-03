@@ -54,7 +54,7 @@ public class RandomFeatureSelection extends StochasticFeatureSelection implement
 
     @Override
     public String getAlgorithmName() {
-        return "Random Feature Selection";
+        return "Random";
     }
 
     @Override

@@ -12,16 +12,18 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class AMSO  extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
+public class AMSO extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
+
     private int numberOfSubSwarms = 3;
     private int populationSize = 50;
     private BigDecimal c = BigDecimal.valueOf(1.49445);
     private int numberOfIteration = 100;
-    int subSwarmSize = populationSize/numberOfSubSwarms;
+    int subSwarmSize = populationSize / numberOfSubSwarms;
     int betaSubswarmUpdatingTHreshold = 7;
     private static final int NO_RUNS = 30;
     private ArrayList<BigDecimal> iterationFitnessValues = Lists.newArrayList();
@@ -34,7 +36,7 @@ public class AMSO  extends StochasticFeatureSelection implements FeatureSelectio
         symmetricalUncertAttributeEval.buildEvaluator(data);
         Ranker ranker = new Ranker();
         ranker.search(symmetricalUncertAttributeEval, data);
-        double [][] ranked = ranker.rankedAttributes();
+        double[][] ranked = ranker.rankedAttributes();
         int numberOfAttributes = data.numAttributes() - 1;
 
         DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -42,7 +44,8 @@ public class AMSO  extends StochasticFeatureSelection implements FeatureSelectio
         List<FeatureSelectionResult> fsResults = Lists.newArrayList();
         FeatureSelectionResult bestFsResult = null;
 
-        for(int runNo = 0; runNo < NO_RUNS; runNo++) {
+        for (int runNo = 0; runNo < NO_RUNS; runNo++) {
+            System.out.println(Instant.now().toString() + ": Start " + getAlgorithmName() + " - (" + (runNo + 1) + "/" + NO_RUNS + ")");
             ArrayList<AMSOSubswarm> subSwarms = Lists.newArrayList();
 
             for (int i = 0; i < numberOfSubSwarms; i++) {
@@ -106,13 +109,14 @@ public class AMSO  extends StochasticFeatureSelection implements FeatureSelectio
 
             FeatureSelectionResult fsr = new FeatureSelectionResult(data, previousGbest.getFitness().doubleValue(), ConcreteBinarySolution.constructBinarySolution(KnnParticleFitnessCalculator.dimensionsToBooleanArray(previousGbest)));
             iterationFitnessValues.add(previousGbest.getFitness());
-            if(bestFsResult == null){
+            if (bestFsResult == null) {
                 bestFsResult = fsr;
-            }else if(bestFsResult.getAccuracy() < fsr.getAccuracy()){
+            } else if (bestFsResult.getAccuracy() < fsr.getAccuracy()) {
                 bestFsResult = fsr;
             }
             fsResults.add(fsr);
             stats.addValue(fsr.getAccuracy());
+            System.out.println(Instant.now().toString() + ": End " + getAlgorithmName() + " - (" + (runNo + 1) + "/" + NO_RUNS + ")");
         }
 
 
@@ -120,35 +124,35 @@ public class AMSO  extends StochasticFeatureSelection implements FeatureSelectio
     }
 
 
-    private int [] getColumnIndicesToRemove(Instances data, double [][] rankedFeatures, int maxNumberOfFeatures, int subPopulationNumber){
+    private int[] getColumnIndicesToRemove(Instances data, double[][] rankedFeatures, int maxNumberOfFeatures, int subPopulationNumber) {
         int numberOfFeaturesToUse = subPopulationNumber * (maxNumberOfFeatures / numberOfSubSwarms);
-        if (numberOfFeaturesToUse > maxNumberOfFeatures){
+        if (numberOfFeaturesToUse > maxNumberOfFeatures) {
             numberOfFeaturesToUse = maxNumberOfFeatures;
         }
 
-        if(numberOfFeaturesToUse <= 1){
+        if (numberOfFeaturesToUse <= 1) {
             //throw new RuntimeException("Too few features to use in this analysis for AMSO.");
             numberOfFeaturesToUse = 1;
         }
 
-        int columnsToRemoveSize = data.numAttributes() - 1  - numberOfFeaturesToUse;
+        int columnsToRemoveSize = data.numAttributes() - 1 - numberOfFeaturesToUse;
 
-        int [] columnsToRemove = new int[columnsToRemoveSize];
+        int[] columnsToRemove = new int[columnsToRemoveSize];
 
         int removalColumnsIndex = 0;
-        for (int i = numberOfFeaturesToUse; i < data.numAttributes()-1;i++){
-            columnsToRemove[removalColumnsIndex++] = (int)rankedFeatures[i][0];
+        for (int i = numberOfFeaturesToUse; i < data.numAttributes() - 1; i++) {
+            columnsToRemove[removalColumnsIndex++] = (int) rankedFeatures[i][0];
         }
 
         return columnsToRemove;
     }
 
-    private Instances getSubSetFeaturesBasedOnSubPoluation(Instances data, int [] columnsToRemove ) throws Exception {
+    private Instances getSubSetFeaturesBasedOnSubPoluation(Instances data, int[] columnsToRemove) throws Exception {
         Remove remove = new Remove();
         remove.setAttributeIndicesArray(columnsToRemove);
 
-        for(int i =0 ; i < columnsToRemove.length; i++){
-            if (columnsToRemove[i] == data.numAttributes() - 1){
+        for (int i = 0; i < columnsToRemove.length; i++) {
+            if (columnsToRemove[i] == data.numAttributes() - 1) {
                 throw new RuntimeException("Can not delete class attribute!!!");
             }
         }
@@ -161,7 +165,7 @@ public class AMSO  extends StochasticFeatureSelection implements FeatureSelectio
 
     @Override
     public String getAlgorithmName() {
-        return "AMSO Feature Selection";
+        return "AMSO";
     }
 
     @Override

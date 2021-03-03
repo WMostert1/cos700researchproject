@@ -1,0 +1,8 @@
+Dataset;Feature Selection Algorithm;Baseline;Relative Fitness;
+urbanland,arff;Random;0,52448071;0,19193939;
+urbanland,arff;Info Gain Ranker;0,52448071;0,29964195;
+urbanland,arff;Pearson Correlation Ranker;0,52448071;0,29358209;
+urbanland,arff;Sequential Forward Selection;0,52448071;0,32534254;
+urbanland,arff;AMSO;0,52448071;0,30646592;
+urbanland,arff;Sequential Backward Selection;0,52448071;0,19748655;
+urbanland,arff;GA;0,52448071;0,29657299;

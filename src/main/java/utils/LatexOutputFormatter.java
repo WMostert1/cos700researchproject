@@ -22,22 +22,21 @@ public class LatexOutputFormatter extends OutputFormatter {
     @Override
     protected void addHeaders(final String... headers) {
         String header = "\\begin{table*}[h]\n" +
-                "\\centering\n" +
                 "\\caption{" + caption + "}\n" +
                 "\\label{" + label + "}";
 
-        StringBuilder columnsDefinition = new StringBuilder("|");
+        StringBuilder columnsDefinition = new StringBuilder("");
         StringBuilder columnNames = new StringBuilder();
         for (String h : headers) {
-            columnsDefinition.append("c|");
-            columnNames.append("&").append(latexItalic(h));
+            columnsDefinition.append("l");
+            columnNames.append("&").append(h);
         }
         columnNames.delete(0, 1);
         columnNames.append("\\\\");
         header += "\\begin{tabular}{" + columnsDefinition + "}\n" +
-                "\\hline" +
+                "\\noalign{\\smallskip}\\hline\\noalign{\\smallskip}\n" +
                 columnNames +
-                "\\hline\n";
+                "\\noalign{\\smallskip}\\hline\n";
 
         append(header);
     }
@@ -71,13 +70,11 @@ public class LatexOutputFormatter extends OutputFormatter {
         append(rowVal.toString());
         append("\\\\");
         nextRow();
-        append("\\hline");
-        nextRow();
     }
 
     @Override
     public void save() throws FileNotFoundException, UnsupportedEncodingException {
-        String end = "\\end{tabular}\n" +
+        String end = "\\noalign{\\smallskip}\\hline\n\\end{tabular}\n" +
                 "\\end{table*}";
         append(end);
 

@@ -20,6 +20,6 @@ public class RankerPrincipalComponentsMethod extends GenericRankerFeatureSelecti
 
     @Override
     public String getAlgorithmName() {
-        return "Principal Components Analysis";
+        return "Principal Components";
     }
 }

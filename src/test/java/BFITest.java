@@ -3,10 +3,14 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Booleans;
 import fitness.FitnessEvaluator;
 import org.junit.Test;
+import utils.DataSetInstanceSplitter;
+import weka.attributeSelection.InfoGainAttributeEval;
 import weka.core.Instances;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
 public class BFITest {
 
@@ -45,6 +49,14 @@ public class BFITest {
 
 
             data = JournalApplication.getDataSet("artificial_test.arff");
+
+            DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, PERCENTAGE_SPLIT);
+            InfoGainAttributeEval infoGainAttributeEval = new InfoGainAttributeEval();
+            infoGainAttributeEval.setMissingMerge(true);
+            infoGainAttributeEval.buildEvaluator(splitter.getTrainingSet());
+
+            infoGainAttributeEval.evaluateAttribute(0);
+
             fitnessEvaluator = new FitnessEvaluator(new IBkClassifier(), data.numAttributes() - 1, true);
 
 

@@ -1,0 +1,15 @@
+Dataset;Feature Selection Algorithm;Baseline;Relative Fitness;
+urbanland,arff;Random;0,52448071;0,1961083;
+urbanland,arff;Info Gain Ranker;0,52448071;0,29964195;
+urbanland,arff;Pearson Correlation Ranker;0,52448071;0,29358209;
+urbanland,arff;Sequential Forward Selection;0,52448071;0,32534254;
+urbanland,arff;AMSO;0,52448071;0,30560193;
+urbanland,arff;Sequential Backward Selection;0,52448071;0,19748655;
+urbanland,arff;GA;0,52448071;0,29579097;
+Hill_Valley_sample,arff;Random;0,28465347;0,19772349;
+Hill_Valley_sample,arff;Info Gain Ranker;0,28465347;0,25922785;
+Hill_Valley_sample,arff;Pearson Correlation Ranker;0,28465347;0,26096719;
+Hill_Valley_sample,arff;Sequential Forward Selection;0,28465347;0,31588126;
+Hill_Valley_sample,arff;Sequential Backward Selection;0,28465347;0,21218153;
+Hill_Valley_sample,arff;AMSO;0,28465347;0,28595613;
+Hill_Valley_sample,arff;GA;0,28465347;0,31372979;

@@ -1,0 +1,35 @@
+\begin{table*}[h]
+\caption{Data Sets}
+\label{tbl:datasets}\begin{tabular}{lllll}
+\noalign{\smallskip}\hline\noalign{\smallskip}
+Index&Name&No. Attributes&No. Instances&No. Classes\\\noalign{\smallskip}\hline
+27&colic.arff&27&368&2\\
+28&vote.arff&16&435&2\\
+29&lung-cancer.arff&56&32&2\\
+30&primary-tumor.arff&17&339&22\\
+31&heart-c.arff&13&303&5\\
+32&breast-cancer.arff&9&286&2\\
+33&solar-flare.arff&12&323&2\\
+34&sponge.arff&45&76&3\\
+35&flags.arff&29&194&8\\
+36&heart-h.arff&13&294&5\\
+37&zoo.arff&17&101&7\\
+38&lymph.arff&18&148&4\\
+39&autos.arff&25&205&7\\
+40&breast-w.arff&9&699&2\\
+41&synthetic-control.arff&61&600&6\\
+42&sonar.arff&60&208&2\\
+43&credit-a.arff&15&690&2\\
+44&dermatology.arff&34&366&6\\
+45&cylinder-bands.arff&39&540&2\\
+46&audiology.arff&69&226&24\\
+47&labor.arff&16&57&2\\
+48&hepatitis.arff&19&155&2\\
+49&heart-statlog.arff&13&270&2\\
+50&soybean.arff&35&683&19\\
+51&glass.arff&9&214&7\\
+52&ionosphere.arff&34&351&2\\
+53&molecular-biology.arff&58&106&4\\
+\noalign{\smallskip}\hline
+\end{tabular}
+\end{table*}

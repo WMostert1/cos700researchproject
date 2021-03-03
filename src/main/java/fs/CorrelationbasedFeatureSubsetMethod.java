@@ -38,6 +38,6 @@ public class CorrelationbasedFeatureSubsetMethod implements FeatureSelectionAlgo
 
     @Override
     public String getAlgorithmName() {
-        return "Correlation based Feature Subset Evaluation";
+        return "Correlation Based Feature Subset Evaluation";
     }
 }

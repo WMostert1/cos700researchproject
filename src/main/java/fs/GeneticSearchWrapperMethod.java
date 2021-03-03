@@ -13,6 +13,7 @@ import weka.core.Instances;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class GeneticSearchWrapperMethod extends StochasticFeatureSelection imple
 
 
             for(int i = 0; i < GA_RUNS; i++) {
-
+                System.out.println(Instant.now().toString() + ": Start " + getAlgorithmName() + " - (" + (i + 1) + "/" + GA_RUNS + ")");
                 GeneticSearch geneticSearch = new GeneticSearch();
                 geneticSearch.setSeed(random.nextInt());
                 int[] subAttributes = geneticSearch.search(wrapper, splitter.getTrainingSet());
@@ -68,6 +69,7 @@ public class GeneticSearchWrapperMethod extends StochasticFeatureSelection imple
                 if (BigDecimal.valueOf(bestBundle.getAccuracy()).compareTo(BigDecimal.valueOf(bundle.getAccuracy())) < 0) {
                     bestBundle = bundle;
                 }
+                System.out.println(Instant.now().toString() + ": End " + getAlgorithmName() + " - (" + (i + 1) + "/" + GA_RUNS + ")");
             }
 
             iterationFitnessValues.clear();
@@ -95,7 +97,7 @@ public class GeneticSearchWrapperMethod extends StochasticFeatureSelection imple
 
     @Override
     public String getAlgorithmName() {
-        return "Genetic Search Wrapper Method";
+        return "GA";
     }
 
     @Override

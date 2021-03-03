@@ -36,7 +36,7 @@ public class IBkClassifier implements IClassify {
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(ibk, testing);
 
-
+        //return MathUtils.doubleToBigDecimal(eval.kappa()).doubleValue();
         return MathUtils.doubleToBigDecimal(eval.unweightedMicroFmeasure()).doubleValue();
     }
 

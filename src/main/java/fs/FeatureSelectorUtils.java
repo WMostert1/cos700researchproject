@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import fitness.FitnessEvaluator;
 import lons.examples.BinarySolution;
 import lons.examples.ConcreteBinarySolution;
+import org.checkerframework.checker.formatter.FormatUtil;
 import utils.DataSetInstanceSplitter;
 import utils.GlobalConstants;
 import weka.attributeSelection.*;
@@ -88,8 +89,14 @@ public class FeatureSelectorUtils {
             columnsToKeep = newColumnsToKeep;
         }
 
-        if (columnsToKeep.length < 2)
-            throw new RuntimeException("All attributes except for class will be deleted.");
+        try {
+            if (columnsToKeep.length < 2) {
+                throw new RuntimeException("All attributes except for class will be deleted.");
+
+            }
+        }catch (Exception e){
+            System.err.println(e.getMessage());
+        }
 
         remove.setAttributeIndicesArray(columnsToKeep);
         remove.setInputFormat(data);

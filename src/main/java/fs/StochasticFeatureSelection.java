@@ -16,7 +16,7 @@ public abstract class StochasticFeatureSelection {
             return;
 
         for(BigDecimal d : fitness)
-            outputFormatter.addAsColumns(d.subtract(baselineFitness).toString());
+            outputFormatter.addAsColumns(d.subtract(baselineFitness));
 
         try {
             outputFormatter.save();

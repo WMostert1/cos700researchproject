@@ -15,6 +15,7 @@ public class SequentialBackwardSelection extends SequentialForwardSelection impl
         greedyStepwise.setOptions(weka.core.Utils.splitOptions("weka.attributeSelection.GreedyStepwise -B -N -1 -num-slots 1 "));
 
         DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, PERCENTAGE_SPLIT);
+
         return seqSelect(greedyStepwise, fitnessEvaluator, data, splitter);
     }
 

@@ -1,3 +1,3 @@
-;Random Feature Selection;AMSO Feature Selection;Ranker Info Gain Filter Method;Sequential Forward Selection;Pearson Correlation Ranker;Sequential Backward Selection;Genetic Search Wrapper Method;
+;Random;AMSO;GA;Sequential Backward Selection;Sequential Forward Selection;Pearson Correlation Ranker;Info Gain Ranker;
 
-Random Feature Selection;0,165;0,414;0,251;0,188;0,230;0,369;0,452;
+Hill_V;0,2012;0,2840;0,3116;0,2122;0,3159;0,2610;0,2592;

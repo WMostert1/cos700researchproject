@@ -58,6 +58,6 @@ public class FullPSOSearchFeatureSelection implements FeatureSelectionAlgorithm 
 
     @Override
     public String getAlgorithmName() {
-        return "Full GBest PSO";
+        return "GBest PSO";
     }
 }

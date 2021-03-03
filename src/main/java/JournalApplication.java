@@ -11,11 +11,7 @@ import landscape.FitnessDistributionMeasure;
 import landscape.NeutralityMeasure;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.Pair;
-import utils.CompositeOutputFormatter;
-import utils.CsvOutputFormatter;
-import utils.LatexOutputFormatter;
-import utils.MathUtils;
-import utils.OutputFormatter;
+import utils.*;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -25,8 +21,10 @@ import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.*;
 
+import static fs.FSRunner.RUN_DELIMINATOR;
 import static utils.MathUtils.bigDecimalToString;
 import static utils.MathUtils.doubleToBigDecimal;
 import static utils.MathUtils.doubleToString;
@@ -37,44 +35,22 @@ import static utils.MathUtils.doubleToString;
  */
 public class JournalApplication {
 
-    private static void sortIntArr(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr.length; j++) {
-                if (i == j) {
-                    continue;
-                }
+    public static final String DATA_SET_PATH = "data-sets/used/";
 
-                if (arr[j] > arr[i]) {
-                    int temp = arr[i];
-                    arr[i] = arr[j];
-                    arr[j] = temp;
-                }
-            }
+    public static void startAll(Collection<Thread> c) {
+        for (Thread t : c) {
+            t.start();
         }
     }
 
-    public static void startAll(Collection<Thread> c) {
-        for(Thread t : c) t.start();
-    }
-
     public static void waitFor(Collection<Thread> c) throws InterruptedException {
-        for(Thread t : c) t.join();
+        for (Thread t : c) {
+            t.join();
+        }
     }
-
-    private InputStream getResourceAsStream(String resource) {
-        final InputStream in
-                = getContextClassLoader().getResourceAsStream(resource);
-
-        return in == null ? getClass().getResourceAsStream(resource) : in;
-    }
-
-    private ClassLoader getContextClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
-
 
     public static Instances getDataSet(String name) throws Exception {
-        DataSource source = new DataSource(EvoCOPPaperApplication.class.getResourceAsStream("data-sets/used/" + name));
+        DataSource source = new DataSource(EvoCOPPaperApplication.class.getResourceAsStream(DATA_SET_PATH + name));
 
         Instances originalData = source.getDataSet();
 
@@ -91,20 +67,38 @@ public class JournalApplication {
 
         int numberOfMaximumDataSetsToFind = 30;
         int minimumNumberOfAttributes = 10;
+        int maximumNumberOfAttributes = 1000;
         int maximumNumberOfDataInstances = 800;
 
         List<String> dataSets = new ArrayList<>();
         boolean moveToErrorFolder = false;
-
-        File folder = new File("./src/main/resources/data-sets/used");
+        //"./src/main/resources/data-sets/used"
+        File folder = new File("./src/main/resources/" + DATA_SET_PATH);
         File[] listOfFiles = folder.listFiles();
+
+        //"arcene.arff"
+        List<String> excludeList = Lists.newArrayList();
+
 
         for (int i = 0; i < listOfFiles.length && dataSets.size() < numberOfMaximumDataSetsToFind; i++) {
             if (listOfFiles[i].isFile()) {
                 String dataSetName = listOfFiles[i].getName();
-                Instances originalData = getDataSet(dataSetName);
-                if (originalData.numAttributes() < minimumNumberOfAttributes ||
-                        originalData.numInstances() > maximumNumberOfDataInstances) {
+
+                if(excludeList.contains(dataSetName)){
+                    continue;
+                }
+
+                try {
+                    Instances originalData = getDataSet(dataSetName);
+
+                    if (originalData.numAttributes() < minimumNumberOfAttributes ||
+                            originalData.numAttributes() > maximumNumberOfAttributes ||
+                            originalData.numInstances() > maximumNumberOfDataInstances) {
+                        continue;
+                    }
+
+                    System.out.println("Number of attributes: " + originalData.numAttributes() + " : " + dataSetName);
+                } catch (Exception e) {
                     continue;
                 }
                 dataSets.add(dataSetName);
@@ -118,7 +112,8 @@ public class JournalApplication {
             System.out.println(dataSetName);
         }
 
-        File directory = new File("out/fitness");
+        new File("out/"+RUN_DELIMINATOR).mkdir();
+        File directory = new File("out/"+RUN_DELIMINATOR+"/fitness");
         if (!directory.exists()) {
             directory.mkdir();
             // If you require it to make the entire directory path including parents,
@@ -127,26 +122,27 @@ public class JournalApplication {
 
         List<String> badSets = new ArrayList<>();
 
-        OutputFormatter outF = new CsvOutputFormatter("out/relative-fs.csv", "Dataset", "Feature Selection Algorithm", "Baseline", "Relative Fitness");
-        OutputFormatter outStats = new CsvOutputFormatter("out/stats.csv");
-        OutputFormatter outNeutrality = new CsvOutputFormatter("out/neutrality.csv");
-        OutputFormatter outRuggedness = new CsvOutputFormatter("out/rugedness.csv");
-        OutputFormatter outFitnessFrequency = new CsvOutputFormatter("out/fitnessfrequency.csv");
+        OutputFormatter outF = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/relative-fs.csv", "Dataset", "Feature Selection Algorithm", "Baseline", "Relative Fitness");
+        OutputFormatter outStats = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/stats.csv");
+        OutputFormatter outNeutrality = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/neutrality.csv");
+        OutputFormatter outRuggedness = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/rugedness.csv");
+        OutputFormatter outFitnessFrequency = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/fitnessfrequency.csv");
 
         List<FeatureSelectionAlgorithm> algorithms = Lists.newArrayList();
 
         algorithms.add(new RandomFeatureSelection());
         //algorithms.add(new FullPSOSearchFeatureSelection());
         algorithms.add(new AMSO());
-        algorithms.add(new RankerInformationGainMethod());
+        algorithms.add(new GeneticSearchWrapperMethod());
+        algorithms.add(new SequentialBackwardSelection());
         algorithms.add(new SequentialForwardSelection());
         algorithms.add(new RankerPearsonCorrelationMethod());
         //algorithms.add(new CorrelationbasedFeatureSubsetMethod());
-        algorithms.add(new SequentialBackwardSelection());
-        algorithms.add(new GeneticSearchWrapperMethod());
+        algorithms.add(new RankerInformationGainMethod());
+
 
         List<String> algorithmNames = Lists.newArrayList();
-        for(FeatureSelectionAlgorithm fsa : algorithms){
+        for (FeatureSelectionAlgorithm fsa : algorithms) {
             algorithmNames.add(fsa.getAlgorithmName());
         }
 
@@ -154,10 +150,10 @@ public class JournalApplication {
 
         String[][] bfiTable = new String[dataSets.size()][];
         for (int i = 0; i < bfiTable.length; i++) {
-            bfiTable[i] = new String[algorithms.size()+1];
+            bfiTable[i] = new String[algorithms.size() + 1];
         }
 
-        for (int i = 0; i < dataSets.size() ; i++) {
+        for (int i = 0; i < dataSets.size(); i++) {
             bfiTable[i][0] = dataSets.get(i);
         }
 
@@ -165,16 +161,15 @@ public class JournalApplication {
 //            bfiTable[0][i] = algorithms.get(i).getAlgorithmName();
 //        }
 
-        String[][] fitnessTable = new String[dataSets.size() + 1][];
+        String[][] fitnessTable = new String[dataSets.size()][];
         for (int i = 0; i < fitnessTable.length; i++) {
-            fitnessTable[i] = new String[algorithms.size() + 2];
+            //dataset name, baseline, algorithms
+            fitnessTable[i] = new String[2 + algorithms.size()];
         }
 
-        for (int i = 1; i < dataSets.size() + 1; i++) {
-            fitnessTable[i][0] = dataSets.get(i - 1);
+        for (int i = 0; i < dataSets.size(); i++) {
+            fitnessTable[i][0] = dataSets.get(i);
         }
-
-        fitnessTable[0][1] = "Baseline";
 
         for (int i = 2; i < algorithms.size() + 1; i++) {
             fitnessTable[0][i] = algorithms.get(i - 1).getAlgorithmName();
@@ -185,6 +180,18 @@ public class JournalApplication {
         dataSetNumber = 0;
 
         Map<String, ArrayList<BigDecimal>> statsValues = new HashMap<>();
+
+        //build data set information
+        for (String dataSet : dataSets) {
+            Instances originalData = getDataSet(dataSet);
+            saveDataSetInfo(new DataSetInfo(dataSet, originalData.numAttributes(), originalData.numInstances(), originalData.numClasses()));
+        }
+        flushDataSetInfo(new CompositeOutputFormatter(new LatexOutputFormatter("out/"+RUN_DELIMINATOR+"/dataSetInformation.tex", "Datasets", "tbl:datasets",
+                "Identifier", "Name", "# Attributes", "# Instances", "# Classes"
+        ), new CsvOutputFormatter("out/dataSetInformation.csv", "Index", "Name", "No. Attributes", "No. Instances", "No. Classes")));
+
+        dataSetNumber = 0;
+
         for (String dataSet : dataSets) {
 
             try {
@@ -194,7 +201,7 @@ public class JournalApplication {
                 System.out.println("------------  " + dataSet + "  ------------");
                 System.out.println("------------- " + originalData.numAttributes() + " Features --------------");
                 System.out.println("------------- " + originalData.numInstances() + " Instances ------------");
-                saveDataSetInfo(new DataSetInfo(dataSet, originalData.numAttributes() - 1, originalData.numInstances(), originalData.numClasses()));
+
 
                 IClassify classifier = new IBkClassifier();
                 FitnessEvaluator fitnessEvaluator = new FitnessEvaluator(classifier, originalData.numAttributes() - 1);
@@ -222,7 +229,7 @@ public class JournalApplication {
 
                 for (FeatureSelectionAlgorithm fsa : algorithms) {
 
-                    fsaThreads.add(new Thread(new FSRunner(dataSet, fsa, originalData, fitnessEvaluator, baselineFitness, dataSetNumber, algorithmNumber++, bfiTable, outF, descriptiveStatistics, statsValues)));
+                    fsaThreads.add(new Thread(new FSRunner(dataSet, fsa, originalData, fitnessEvaluator, baselineFitness, dataSetNumber, algorithmNumber++, bfiTable, fitnessTable, outF, descriptiveStatistics, statsValues)));
 
 //                    try {
 //                        System.out.println(dataSet + " :: " + fsa.getAlgorithmName() + " :: RUNNING");
@@ -264,54 +271,33 @@ public class JournalApplication {
 
 
                 //Measures specific to dataset
-                System.out.println("Calculating fitness landscape characteristics...");
-                outF.addEmptyRow();
-                outF.addAsColumns("STD DEVIATION", Double.toString(descriptiveStatistics.getStandardDeviation()));
-                outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes() - 1));
+//                System.out.println("Calculating fitness landscape characteristics...");
+//                outF.addEmptyRow();
+//                outF.addAsColumns("STD DEVIATION", Double.toString(descriptiveStatistics.getStandardDeviation()));
+//                outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes() - 1));
+//
+//                System.out.println("Calculating neutrality...");
+//                Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
+//                outNeutrality.addAsColumns(dataSet, neatraility.getFirst().toString(), neatraility.getSecond().toString());
+//
+//                System.out.println("Calculating fitness distribution...");
+//                FitnessDistributionMeasure fitnessDistributionMeasure = new FitnessDistributionMeasure(20, -1.0, 1.0, 20);
+//                Map<Integer, Map<boolean[], Double>> fitnessDistro = fitnessDistributionMeasure.get(originalData, fitnessEvaluator);
+//                outFitnessFrequency.addAsColumns(dataSet);
+//
+//                for (int i = 0; i < 20; i++) {
+//                    String key = doubleToString((-1.0 + (0.1 * i)), 2) + "<=f(s)<" + doubleToString(-1.0 + (0.1 * (i + 1)), 2);
+//                    key = key.replace(",", ".");
+//                    outFitnessFrequency.addAsColumns(key, Integer.toString(fitnessDistro.get(i).keySet().size()));
+//                }
 
-                System.out.println("Calculating neutrality...");
-                Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
-                outNeutrality.addAsColumns(dataSet, neatraility.getFirst().toString(), neatraility.getSecond().toString());
-
-                System.out.println("Calculating fitness distribution...");
-                FitnessDistributionMeasure fitnessDistributionMeasure = new FitnessDistributionMeasure(20, -1.0, 1.0, 20);
-                Map<Integer, Map<boolean[], Double>> fitnessDistro = fitnessDistributionMeasure.get(originalData, fitnessEvaluator);
-                outFitnessFrequency.addAsColumns(dataSet);
-
-                for (int i = 0; i < 20; i++) {
-                    String key = doubleToString((-1.0 + (0.1 * i)), 2) + "<=f(s)<" + doubleToString(-1.0 + (0.1 * (i + 1)), 2);
-                    key = key.replace(",", ".");
-                    outFitnessFrequency.addAsColumns(key, Integer.toString(fitnessDistro.get(i).keySet().size()));
-                }
-
-
-
-
-
-
-
-
-                    /*
-                        baseline : 0.5
-                        fitness: -0.3
-                        relative = fitness - baseline
-                     */
-
-                    /*
-                        fitness = [ -1, 1 ], -1 means penalised to the max and fscore is 0
-                                              1 means fscore is 1 and 0 penalty since 1 feature selected
-
-                        baseline = 0...1 - (1) [-1; 0]
-
-                        bfi = [ -1 ; 1 ] - [ -1 ; 0 ]
-
-                        [ -1 ; 2]
-                     */
                 dataSetNumber++;
 
                 outF.save();
                 outNeutrality.save();
                 outFitnessFrequency.save();
+
+                System.out.println(((int) ((double) dataSetNumber / dataSets.size())) + "% finished.");
             } catch (Exception e) {
                 if (moveToErrorFolder) {
                     Files.move(Paths.get("./src/main/resources/data-sets/used/" + dataSet), Paths.get("./src/main/resources/data-sets/error/" + dataSet));
@@ -334,19 +320,45 @@ public class JournalApplication {
         outStats.save();
 
         algorithmNames.add(0, "");
-        OutputFormatter bfiOut = new CompositeOutputFormatter(
-                new CsvOutputFormatter("out/bfiTable.csv", algorithmNames.toArray(new String[0])),
-                new LatexOutputFormatter("out/bfiTable.tex", "BFI Table", "tbl:bfi", algorithmNames.toArray(new String[0]))
-        );
+
+        //Generate the bfi tables
+        OutputFormatter bfiOutCsv = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/bfiTable.csv", algorithmNames.toArray(new String[0]));
+        OutputFormatter bfiOutLatex = new LatexOutputFormatter("out/"+RUN_DELIMINATOR+"/bfiTable.tex", "BFI Table", "tbl:bfi", algorithmNames.toArray(new String[0]));
 
 
-        bfiOut.addAsColumns();
+        bfiOutCsv.addAsColumns();
         for (String[] strings : bfiTable) {
-            bfiOut.addAsColumns(strings);
+            String[] csvStrings = new String[strings.length];
+            for (int i = 0; i < strings.length; i++) {
+                csvStrings[i] = strings[i].substring(0, 2 + GlobalConstants.REPORTED_DECIMAL_PLACES);
+            }
+            bfiOutCsv.addAsColumns(csvStrings);
+            bfiOutLatex.addAsColumns(strings);
         }
-        bfiOut.save();
+        bfiOutCsv.save();
+        bfiOutLatex.save();
 
-        OutputFormatter fitnessOut = new CsvOutputFormatter("out/fitnessTable.csv");
+//        //Generate the bfi table with number of features instead of data sets for scatter plot
+//        OutputFormatter bfiScatterOut = new CsvOutputFormatter("out/bfiTableScatter.csv", algorithmNames.toArray(new String[0]));
+//
+//        int i = 0;
+//        for (String[] strings : bfiTable) {
+//            String [] csvStrings = new String[strings.length];
+//            csvStrings[0] = Integer.toString(getDataSet(dataSets.get(i++)).numAttributes());
+//            for(int k = 0; k < strings.length;k++){
+//                csvStrings[k] = strings[k].substring(0, 2 + GlobalConstants.REPORTED_DECIMAL_PLACES);
+//            }
+//            bfiScatterOut.addAsColumns(csvStrings);
+//        }
+//        bfiScatterOut.save();
+
+
+        //Save data set info table
+
+
+        List<String> fitnessTableHeaders = Lists.newArrayList(algorithmNames);
+        fitnessTableHeaders.add(0, "Baseline");
+        OutputFormatter fitnessOut = new CsvOutputFormatter("out/"+RUN_DELIMINATOR+"/fitnessTable.csv", fitnessTableHeaders.toArray(new String[0]));
         for (String[] strings : fitnessTable) {
             fitnessOut.addAsColumns(strings);
         }
@@ -362,43 +374,10 @@ public class JournalApplication {
 
 
     private static void buildDataSetInfo(OutputFormatter outF, String name, int noAttrs, int noInstances, int noClasses) {
-        if (dataSetNumber == 0) {
-            outF.addAsColumns("Datasets");
-            outF.addAsColumns("Index", "Name", "No. Attributes", "No. Instances", "No. Classes");
-        }
-
-        outF.addAsColumns(Integer.toString(dataSetNumber++), name, Integer.toString(noAttrs),
+        outF.addAsColumns("D"+Integer.toString(++dataSetNumber), name, Integer.toString(noAttrs),
                 Integer.toString(noInstances), Integer.toString(noClasses));
     }
 
-    public static class DataSetInfo {
-
-        private String name;
-        int noAttrs, noInstances, noClasses;
-
-        public DataSetInfo(String name, int noAttrs, int noInstances, int noClasses) {
-            this.name = name;
-            this.noAttrs = noAttrs;
-            this.noInstances = noInstances;
-            this.noClasses = noClasses;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getNoAttrs() {
-            return noAttrs;
-        }
-
-        public int getNoInstances() {
-            return noInstances;
-        }
-
-        public int getNoClasses() {
-            return noClasses;
-        }
-    }
 
     private static List<DataSetInfo> dataSetReport = Lists.newArrayList();
 
@@ -406,108 +385,12 @@ public class JournalApplication {
         dataSetReport.add(info);
     }
 
-    private static void flushDataSetInfo(OutputFormatter outF) {
+    private static void flushDataSetInfo(OutputFormatter outF) throws FileNotFoundException, UnsupportedEncodingException {
         for (DataSetInfo dataSetInfo : dataSetReport) {
-            buildDataSetInfo(outF, dataSetInfo.getName(), dataSetInfo.getNoAttrs(), dataSetInfo.getNoInstances(), dataSetInfo.getNoClasses());
+            buildDataSetInfo(outF, dataSetInfo.getName().replace(".arff",""), dataSetInfo.getNoAttrs(), dataSetInfo.getNoInstances(), dataSetInfo.getNoClasses());
         }
+        outF.save();
     }
 
-    private static List<String> algorithmNames = Lists.newArrayList();
 
-    private static void buildFSInfo(OutputFormatter outF, String algorithmName, String dataSetName, int numberOfGlobalOptima,
-                                    boolean foundLocalOpt, boolean foundGlobalOpt, double percentageCap, double successRatio, double fsAccuracy, double globalAccuracy) {
-        if (!algorithmNames.contains(algorithmName)) {
-            algorithmNames.add(algorithmName);
-            outF.addEmptyRow();
-            outF.addAsColumns(algorithmName);
-            outF.addAsColumns("Dataset name", "No. Global Optima", "Found Local Optima", "Found Global Optima", "Percentage Cap", "Success Ratio", "Feat. S. Fitness", "Global Opt. Fitness");
-        }
-
-        outF.addAsColumns(dataSetName, Integer.toString(numberOfGlobalOptima), Boolean.toString(foundLocalOpt),
-                Boolean.toString(foundGlobalOpt), Double.toString(percentageCap), Double.toString(successRatio), Double.toString(fsAccuracy), Double.toString(globalAccuracy));
-
-    }
-
-    private static class FSReportInfo {
-
-        private String algorithmName;
-        private String dataSetName;
-        private int numberOfGlobalOptima;
-        private boolean foundLocalOpt;
-        private boolean foundGlobalOpt;
-        private double percentageCap;
-        private double fsAccuracy;
-        private double globalAccuracy;
-        private double successRatio;
-
-        public FSReportInfo(String algorithmName, String dataSetName, int numberOfGlobalOptima, boolean foundLocalOpt, boolean foundGlobalOpt, double percentageCap, double successRatio, double fsAccuracy, double globalAccuracy) {
-            this.algorithmName = algorithmName;
-            this.dataSetName = dataSetName;
-            this.numberOfGlobalOptima = numberOfGlobalOptima;
-            this.foundLocalOpt = foundLocalOpt;
-            this.foundGlobalOpt = foundGlobalOpt;
-            this.percentageCap = percentageCap;
-            this.fsAccuracy = fsAccuracy;
-            this.globalAccuracy = globalAccuracy;
-            this.successRatio = successRatio;
-        }
-
-        public double getSuccessRatio() {
-            return successRatio;
-        }
-
-        public String getAlgorithmName() {
-            return algorithmName;
-        }
-
-        public String getDataSetName() {
-            return dataSetName;
-        }
-
-        public int getNumberOfGlobalOptima() {
-            return numberOfGlobalOptima;
-        }
-
-        public boolean isFoundLocalOpt() {
-            return foundLocalOpt;
-        }
-
-        public boolean isFoundGlobalOpt() {
-            return foundGlobalOpt;
-        }
-
-        public double getPercentageCap() {
-            return percentageCap;
-        }
-
-        public double getFsAccuracy() {
-            return fsAccuracy;
-        }
-
-        public double getGlobalAccuracy() {
-            return globalAccuracy;
-        }
-    }
-
-    private static HashMap<String, HashMap<String, FSReportInfo>> fsReportInfo = Maps.newHashMap();
-
-    private static void saveFSInfo(FSReportInfo reportInfo) {
-        HashMap<String, FSReportInfo> algorithmReport = fsReportInfo.get(reportInfo.algorithmName);
-        if (algorithmReport == null) {
-            algorithmReport = Maps.newHashMap();
-        }
-
-        algorithmReport.put(reportInfo.getDataSetName(), reportInfo);
-        fsReportInfo.put(reportInfo.getAlgorithmName(), algorithmReport);
-    }
-
-    private static void flushFSInfo(OutputFormatter outF) {
-        for (String algorithmName : fsReportInfo.keySet()) {
-            for (String dataSetName : fsReportInfo.get(algorithmName).keySet()) {
-                FSReportInfo report = fsReportInfo.get(algorithmName).get(dataSetName);
-                buildFSInfo(outF, algorithmName, dataSetName, report.getNumberOfGlobalOptima(), report.isFoundLocalOpt(),
-                        report.isFoundGlobalOpt(), report.getPercentageCap(), report.getSuccessRatio(), report.getFsAccuracy(), report.getGlobalAccuracy());
-            }
-        }
-    }
 }
