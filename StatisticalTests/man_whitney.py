@@ -1,6 +1,9 @@
+# coding=utf-8
 import csv
 import os
 import matplotlib
+import statistics
+import numpy as np
 
 matplotlib.use('TkAgg')
 import statistics
@@ -12,15 +15,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Polygon
 
-run_identifier = "2021-03-01T18:44:03.083Z|kc(1.0)|kp(0.0)"
+run_identifier = "2021-03-01T18:41:08.947Z|kc(1.0)|kp(0.25)"
 
-if not os.path.exists("out/"+run_identifier):
-    os.makedirs("out/"+run_identifier)
+if not os.path.exists("out/" + run_identifier):
+    os.makedirs("out/" + run_identifier)
 
-directory_root = '/Users/wmostert/Development/cos700researchproject/out/'+run_identifier+"/fitness/"
+directory_root = '/Users/wmostert/Development/cos700researchproject/out/' + run_identifier + "/fitness/"
 # data -> [ ( data_set_name, [ (algorithm_name, [ fitness_values ] ) ] ) ]
 data = []
-
 
 result_table = []
 
@@ -50,10 +52,8 @@ algorithm_names = []
 algorithm_bfi_data = [[] for i in range(0, 6)]
 full_algorithm_names = ['AMSO', 'GAFS', 'SBFS', 'SFFS', 'PCFS', 'IGFS']
 
-
-
 # Read BFI values from csv file but exclude random feature selection
-with open('/Users/wmostert/Development/cos700researchproject/out/'+run_identifier+'/bfiTable.csv') as csv_file:
+with open('/Users/wmostert/Development/cos700researchproject/out/' + run_identifier + '/bfiTable.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=';')
     line_count = 0
     for row in csv_reader:
@@ -65,18 +65,58 @@ with open('/Users/wmostert/Development/cos700researchproject/out/'+run_identifie
             bfi_values = map(lambda x: float(x.replace(",", ".")), row[2:-1])
             annotated_bfi_values = []
             for i in range(0, len(bfi_values)):
-                annotated_bfi_values.append((algorithm_names[i], bfi_values[i]))
+                annotated_bfi_values.append([algorithm_names[i], bfi_values[i]])
                 algorithm_bfi_data[i].append(bfi_values[i])
             bfi_data.append((data_set_name, annotated_bfi_values))
         line_count += 1
 
+full_dataset_names = []
+
+with open('/Users/wmostert/Development/cos700researchproject/out/' + run_identifier + '/dataSetInformation.tex',
+          'r') as dataset_reader:
+    line = dataset_reader.readline()
+    while line != '':  # The EOF char is an empty string
+        if ".arff" in line:
+            full_dataset_names.append(line[line.index("&") + 1:line.index(".arff") + 5])
+
+        line = dataset_reader.readline()
+
 algorithm_ranks = []
 
-for di in range(0, len(bfi_data)):
-    bfi_data[di][1].sort(key=lambda x: x[1], reverse=True)
 
+
+# This is used to mark algorithms as stochastic based on the BFI table name excluding the first one which is random
+stochastic_indexes = ["AMSO", "GA"]
+
+bfi_median_latex_table_data = "";
+ds_index = 0
 for ds in bfi_data:
     print(ds)
+    # Replace the means of the stochastic algorithms with median and IQR
+    row = ["D"+str(ds_index+1)]
+
+    samples = read_data(directory_root + full_dataset_names[ds_index] + "/Random.csv")
+    q3, q1 = np.percentile(np.array(samples), [75, 25])
+    iqr = q3 - q1
+    median = statistics.median(samples)
+    row.append('{:.4f}'.format(median) + "(" + '{:.2f}'.format(q3)+"-"+'{:.2f}'.format(q1)+")")
+
+    for algorithm in ds[1]:
+        if algorithm[0] in stochastic_indexes:
+            samples = read_data(directory_root + full_dataset_names[ds_index] + '/' + algorithm[0] + ".csv")
+            q3, q1 = np.percentile(np.array(samples), [75, 25])
+            iqr = q3 - q1
+            median = statistics.median(samples)
+            row.append('{:.4f}'.format(median) + "(" + '{:.2f}'.format(q3)+"-"+'{:.2f}'.format(q1)+")")
+            algorithm[1] = median
+        else:
+            row.append('{:.4f}'.format(algorithm[1]))
+
+    bfi_median_latex_table_data += "&".join(row)+"\\\\\n"
+    ds_index += 1
+
+print("BFI Median Data")
+print(bfi_median_latex_table_data)
 
 # Build box plots of the BFI values per algorithm
 
@@ -96,14 +136,16 @@ plt.setp(bp['whiskers'], color='black')
 plt.setp(bp['medians'], color='black')
 plt.setp(bp['fliers'], color='black')
 
-fig.savefig("out/"+run_identifier+"/multi-box-bfi.png")
+fig.savefig("out/" + run_identifier + "/multi-box-bfi.png")
 
 ## Create box plots of just fitness
 
 algorithm_fitness_data = [[] for i in range(0, 6)]
 
+
 def all_vals_in_array_equal(arr):
     return all(elem == arr[0] for elem in arr)
+
 
 # Read BFI values from csv file but exclude random feature selection
 # with open('/Users/wmostert/Development/cos700researchproject/out/fitnessTable.csv') as csv_file:
@@ -144,9 +186,6 @@ for root, dirs, files in os.walk(directory_root):
 # Mann-Whitney U test
 
 
-# This is used to mark algorithms as stochastic based on the BFI table name excluding the first one which is random
-stochastic_indexes = ["AMSO", "GA"]
-
 shared_ranks = []
 
 data_set_index = 1
@@ -155,8 +194,9 @@ for problem_data in data:
     print ('--------' + data_set_name + '--------')
     number_of_algorithms = len(problem_data[1])
     equal_algorithms = ("D" + str(data_set_index), [])
-    # For all pairwise comparisons of algorithms
+    # For all pairwise comparisons of stochastic algorithms
     for i in range(number_of_algorithms):
+        # Do a Mann Whitney U test for all algorithms that are stochastic
         for j in range(i, number_of_algorithms):
             if i == j:
                 continue
@@ -182,8 +222,27 @@ for problem_data in data:
                     equal_algorithms[1].append((algorithm_one_name, algorithm_two_name))
                 else:
                     raise e
-            shared_ranks.append(equal_algorithms)
-            data_set_index += 1
+
+        # do interval checking for deterministic algorithms
+        stdeviation = statistics.stdev(problem_data[1][i][1])
+        q3, q1 = np.percentile(np.array(problem_data[1][i][1]), [75, 25])
+        iqr = q3 - q1
+        mean = statistics.mean(problem_data[1][i][1])
+        median = statistics.median(problem_data[1][i][1])
+
+        for d in range(len((bfi_data[data_set_index - 1][1]))):
+            algorithm_j = bfi_data[data_set_index - 1][1][d][0]
+            if algorithm_j in stochastic_indexes:
+                continue
+
+            bfi_val = bfi_data[data_set_index - 1][1][d][1]
+            if q3 >= bfi_val >= q1:
+                # if bfi_val <= mean + stdeviation and bfi_val >= mean - stdeviation:
+                equal_algorithms[1].append((problem_data[1][i][0], algorithm_j))
+    data_set_index += 1
+    shared_ranks.append(equal_algorithms)
+
+
 
 print ("-----------")
 
@@ -207,11 +266,15 @@ shared_ranks_table += ("\\noalign{\\smallskip}\\hline\n"
                        "\\end{tabular}\n"
                        "\\end{table}\n")
 
-with open("out/"+run_identifier+"/shared_ranks_table.tex", "w") as text_file:
+with open("out/" + run_identifier + "/shared_ranks_table.tex", "w") as text_file:
     text_file.write(shared_ranks_table)
 
 # [ (dataset, [ranks])]
 ranked_bfi_data = []
+
+# sort the BFI values so that higher values are first
+for di in range(0, len(bfi_data)):
+    bfi_data[di][1].sort(key=lambda x: x[1], reverse=True)
 
 data_set_index = 0
 i = 0
@@ -220,61 +283,96 @@ for bfi in bfi_data:
     data_set_name = "D" + str(i)
     algorithm_values = bfi[1]
 
-    ranks_result = range(len(algorithm_names))
+    ranks_result = []
+    for x in range(0, len(algorithm_names)):
+        ranks_result.append(0)
+
     previous_used_rank = 1
 
     algorithms_that_share_rank = shared_ranks[data_set_index]
 
-    blacklist = []
+    # Check determistic algorithms and add their shared ranks if they are the same
+    for alg_i in range(0,len(algorithm_values)):
+        for alg_j in range(0, len(algorithm_values)):
+            if alg_i == alg_j:
+                continue
+            if algorithm_values[alg_i][0] in stochastic_indexes or algorithm_values[alg_j][0] in stochastic_indexes:
+                continue
+            if algorithm_values[alg_i][1] == algorithm_values[alg_j][1]:
+                algorithms_that_share_rank[1].append((algorithm_values[alg_i][0], algorithm_values[alg_j][0]))
 
-    previous_fitness = None
-    while len(algorithm_values) != 0:
-        algorithm_name = algorithm_values[0][0]
-
-        if algorithm_name in blacklist:
-            # Algorithms that rank together have already been ranked
-            del algorithm_values[0]
-            continue
-
+    for algorhtm_index in range(0, len(algorithm_values)):
+        algorithm_name = algorithm_values[algorhtm_index][0]
         algorithm_names_index = algorithm_names.index(algorithm_name)
+        if ranks_result[algorithm_names_index] == 0:
+            ranks_result[algorithm_names_index] = previous_used_rank
+        # shared_ranks_indexes_used = []
+        for shared_ranks_i in range(0, len(algorithms_that_share_rank[1])):
+            if algorithm_name in algorithms_that_share_rank[1][shared_ranks_i]:
+                # if shared_ranks_i in shared_ranks_indexes_used:
+                #     continue
 
-        # The rank is the index of the ranked bfi data
-        rank = previous_used_rank
-
-        # If there is a shared rank then find both
-
-        shared_algorithm = get_value(algorithms_that_share_rank[1], algorithm_name)
-        if shared_algorithm is not None:
-            algorithm_names_index_one = algorithm_names.index(shared_algorithm[0])
-            algorithm_names_index_two = algorithm_names.index(shared_algorithm[1])
-
-            blacklist.append(shared_algorithm[0])
-            blacklist.append(shared_algorithm[1])
-
-            if previous_fitness != algorithm_values[0][1] and previous_fitness is not None:
-                previous_used_rank += 1
-                if previous_fitness is None:
-                    previous_used_rank -= 1
-                rank = previous_used_rank
-            previous_fitness = algorithm_values[0][1]
-
-            ranks_result[algorithm_names_index_one] = rank
-            ranks_result[algorithm_names_index_two] = rank
-
-            del algorithm_values[0]
-            continue
-
-        if previous_fitness != algorithm_values[0][1]:
+                # shared_ranks_indexes_used.append(shared_ranks_i)
+                alg_one_index = algorithm_names.index(algorithms_that_share_rank[1][shared_ranks_i][0])
+                alg_two_index = algorithm_names.index(algorithms_that_share_rank[1][shared_ranks_i][1])
+                if ranks_result[alg_one_index] == 0:
+                    ranks_result[alg_one_index] = previous_used_rank
+                if ranks_result[alg_two_index] == 0:
+                    ranks_result[alg_two_index] = previous_used_rank
+        if previous_used_rank in ranks_result:
             previous_used_rank += 1
-            if previous_fitness is None:
-                previous_used_rank -= 1
-            rank = previous_used_rank
-            # if rank == 1 and i == 1:
-            #     rank = previous_used_rank
-        previous_fitness = algorithm_values[0][1]
 
-        ranks_result[algorithm_names_index] = rank
-        del algorithm_values[0]
+
+    # blacklist = []
+    #
+    # previous_fitness = None
+    # while len(algorithm_values) != 0:
+    #     algorithm_name = algorithm_values[0][0]
+    #
+    #     if algorithm_name in blacklist:
+    #         # Algorithms that rank together have already been ranked
+    #         del algorithm_values[0]
+    #         continue
+    #
+    #     algorithm_names_index = algorithm_names.index(algorithm_name)
+    #
+    #     # The rank is the index of the ranked bfi data
+    #     rank = previous_used_rank
+    #
+    #     # If there is a shared rank then find both
+    #
+    #     shared_algorithm = get_value(algorithms_that_share_rank[1], algorithm_name)
+    #     if shared_algorithm is not None:
+    #         algorithm_names_index_one = algorithm_names.index(shared_algorithm[0])
+    #         algorithm_names_index_two = algorithm_names.index(shared_algorithm[1])
+    #
+    #         blacklist.append(shared_algorithm[0])
+    #         blacklist.append(shared_algorithm[1])
+    #
+    #         if previous_fitness != algorithm_values[0][1] and previous_fitness is not None:
+    #             previous_used_rank += 1
+    #             if previous_fitness is None:
+    #                 previous_used_rank -= 1
+    #             rank = previous_used_rank
+    #         previous_fitness = algorithm_values[0][1]
+    #
+    #         ranks_result[algorithm_names_index_one] = rank
+    #         ranks_result[algorithm_names_index_two] = rank
+    #
+    #         del algorithm_values[0]
+    #         continue
+    #
+    #     if previous_fitness != algorithm_values[0][1]:
+    #         previous_used_rank += 1
+    #         if previous_fitness is None:
+    #             previous_used_rank -= 1
+    #         rank = previous_used_rank
+    #         # if rank == 1 and i == 1:
+    #         #     rank = previous_used_rank
+    #     previous_fitness = algorithm_values[0][1]
+    #
+    #     ranks_result[algorithm_names_index] = rank
+    #     del algorithm_values[0]
 
     ranked_bfi_data.append((data_set_name, ranks_result))
     data_set_index += 1
@@ -299,7 +397,7 @@ ranks_table += ("\\noalign{\\smallskip}\\hline\n"
                 "\\end{tabular}\n"
                 "\\end{table}\n")
 
-with open("out/"+run_identifier+"/ranks_table.tex", "w") as text_file:
+with open("out/" + run_identifier + "/ranks_table.tex", "w") as text_file:
     text_file.write(ranks_table)
 
 for r in ranked_bfi_data:
@@ -336,7 +434,7 @@ rank_count_table += ("\\noalign{\\smallskip}\\hline\n"
                      "\\end{table}\n")
 # remove data sets where all algorithms are on the same rank
 
-with open("out/"+run_identifier+"/rank_count_table.tex", "w") as text_file:
+with open("out/" + run_identifier + "/rank_count_table.tex", "w") as text_file:
     text_file.write(rank_count_table)
 
 algorithm_specific_ranks = []
@@ -351,7 +449,7 @@ for alg_i in range(0, len(algorithm_names)):
 
 # Calculate box plots
 no_boxplot_rows = 2
-#fig, axs = plt.subplots(no_boxplot_rows, len(algorithm_names) / no_boxplot_rows)
+# fig, axs = plt.subplots(no_boxplot_rows, len(algorithm_names) / no_boxplot_rows)
 
 x = -1
 # for index in range(0, len(algorithm_names)):
@@ -385,5 +483,4 @@ plt.setp(bp['whiskers'], color='black')
 plt.setp(bp['medians'], color='black')
 plt.setp(bp['fliers'], color='black')
 
-
-fig.savefig("out/"+run_identifier+"/algorithm_rank_boxplots.png", dpi=300)
+fig.savefig("out/" + run_identifier + "/algorithm_rank_boxplots.png", dpi=300)
