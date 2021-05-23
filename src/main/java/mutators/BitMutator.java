@@ -29,6 +29,7 @@ public abstract class BitMutator {
         boolean [] arr = new boolean[size];
         for(int i = 0; i < size; i++)
             arr[i] = randomGen.nextBoolean();
+
         if(satisifesMinimumPercentageAttributes(arr))
             return arr;
         else return getRandomPoint(size);

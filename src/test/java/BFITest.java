@@ -10,7 +10,7 @@ import weka.core.Instances;
 import java.util.Arrays;
 import java.util.List;
 
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
+import static utils.GlobalConstants.TRAINING_PERCENTAGE;
 
 public class BFITest {
 
@@ -50,7 +50,7 @@ public class BFITest {
 
             data = JournalApplication.getDataSet("artificial_test.arff");
 
-            DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, PERCENTAGE_SPLIT);
+            DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, TRAINING_PERCENTAGE);
             InfoGainAttributeEval infoGainAttributeEval = new InfoGainAttributeEval();
             infoGainAttributeEval.setMissingMerge(true);
             infoGainAttributeEval.buildEvaluator(splitter.getTrainingSet());

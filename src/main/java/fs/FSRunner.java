@@ -3,6 +3,7 @@ package fs;
 import fitness.FitnessEvaluator;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import utils.CsvOutputFormatter;
+import utils.GlobalConstants;
 import utils.OutputFormatter;
 import weka.core.Instances;
 
@@ -17,7 +18,7 @@ import static utils.MathUtils.doubleToBigDecimal;
 
 public class FSRunner implements Runnable {
 
-    public static final String RUN_DELIMINATOR = Instant.now().toString() + "|kc(" + FitnessEvaluator.classifierScalingConstant + ")|kp(" + FitnessEvaluator.penaltyScalingConstant + ")";
+    public static final String RUN_DELIMINATOR = Instant.now().toString() + "|kc(" + GlobalConstants.K_C + ")|kp(" + GlobalConstants.K_P + ")";
 
     private String dataSet;
 

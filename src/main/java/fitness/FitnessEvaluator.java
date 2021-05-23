@@ -5,17 +5,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import exceptions.DataException;
 import fs.FeatureSelectorUtils;
-import landscape.FitnessDistributionMeasure;
 import lons.examples.ConcreteBinarySolution;
 import samplers.ExhaustiveSampler;
 import samplers.SolutionSampler;
 import utils.DataSetInstanceSplitter;
+import utils.GlobalConstants;
 import utils.MathUtils;
 import weka.core.Attribute;
 import weka.core.Instances;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
+import static utils.GlobalConstants.TRAINING_PERCENTAGE;
+import static utils.GlobalConstants.getBfiMax;
+import static utils.GlobalConstants.getBfiMin;
 
 /**
  * Created by bbdnet1339 on 2016/08/08.
@@ -39,9 +40,7 @@ public class FitnessEvaluator {
     private Map<String, Double> fitnessCache = Maps.newHashMap();
     private final static Double WORST_FITNESS = 0.0;
     private boolean verbose = false;
-
-    public static final BigDecimal classifierScalingConstant = BigDecimal.valueOf(1.0);
-    public static final BigDecimal penaltyScalingConstant = BigDecimal.valueOf(0.25);
+    private BigDecimal baselineFitness;
 
 
     public FitnessEvaluator(IClassify classifier, int originalNumberOfAttributes, boolean verbose) {
@@ -60,7 +59,35 @@ public class FitnessEvaluator {
         this.multiThread = multiThread;
         this.classifier = classifier;
         this.initialNumberOfAttributes = MathUtils.doubleToBigDecimal((double) originalNumberOfAttributes);
-        ;
+    }
+
+    private BigDecimal getBaselineFitness(Instances originalInstances) throws Exception {
+        if (this.baselineFitness != null) {
+            return baselineFitness;
+        }
+        DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(originalInstances, TRAINING_PERCENTAGE);
+        Instances trainingSet = splitter.getTrainingSet();
+        Instances testingSet = splitter.getTestingSet();
+
+        BigDecimal classifierAccuracy = MathUtils.doubleToBigDecimal(classifier.getClassificationAccuracy(trainingSet, testingSet));
+        this.baselineFitness = calculateFitness(classifierAccuracy, originalInstances);
+        return baselineFitness;
+    }
+
+    private BigDecimal calculateFitness(BigDecimal classifierAccuracy, Instances currentInstances) {
+        BigDecimal scaledClassifierAccuracy = classifierAccuracy.multiply(GlobalConstants.K_C);
+        BigDecimal numberOfAttributes = MathUtils.doubleToBigDecimal((double) (currentInstances.numAttributes() - 1));
+
+        //The smaller this value the better
+        //nfs = number of features selected
+        //nf = number of features available
+        //penalty(nfs) = 1/9 (10^((nfs-1)/(nf-1)) - 1)
+        BigDecimal exponent = (numberOfAttributes.subtract(BigDecimal.ONE)).divide(initialNumberOfAttributes.subtract(BigDecimal.ONE), MathUtils.ROUNDING_MODE);
+        BigDecimal penalty = BigDecimal.valueOf(Math.pow(10.0, exponent.doubleValue())).subtract(BigDecimal.ONE).divide(BigDecimal.valueOf(9.0), MathUtils.ROUNDING_MODE);
+        penalty = penalty.multiply(GlobalConstants.K_P);
+
+        BigDecimal fitness = scaledClassifierAccuracy.subtract(penalty);
+        return fitness;
     }
 
     //Baseline Fitness Improvement
@@ -87,12 +114,11 @@ public class FitnessEvaluator {
             System.out.println(attributes);
         }
 
-        DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(currentInstances, PERCENTAGE_SPLIT);
+        DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(currentInstances, TRAINING_PERCENTAGE);
         Instances trainingSet = splitter.getTrainingSet();
         Instances testingSet = splitter.getTestingSet();
 
         BigDecimal classifierAccuracy = MathUtils.doubleToBigDecimal(classifier.getClassificationAccuracy(trainingSet, testingSet));
-        classifierAccuracy = classifierAccuracy.multiply(classifierScalingConstant);
 
         BigDecimal numberOfAttributes = MathUtils.doubleToBigDecimal((double) (currentInstances.numAttributes() - 1));
 
@@ -100,23 +126,12 @@ public class FitnessEvaluator {
             throw new RuntimeException("Remember to construct this class for each data set");
         }
 
-        //The smaller this value the better
-        //nfs = number of features selected
-        //nf = number of features available
-        //penalty(nfs) = 1/9 (10^((nfs-1)/(nf-1)) - 1)
-        BigDecimal exponent = (numberOfAttributes.subtract(BigDecimal.ONE)).divide(initialNumberOfAttributes.subtract(BigDecimal.ONE), MathUtils.ROUNDING_MODE);
-        BigDecimal penalty = BigDecimal.valueOf(Math.pow(10.0, exponent.doubleValue())).subtract(BigDecimal.ONE).divide(BigDecimal.valueOf(9.0), MathUtils.ROUNDING_MODE);
-        penalty = penalty.multiply(penaltyScalingConstant);
+        BigDecimal fitness = calculateFitness(classifierAccuracy, currentInstances).subtract(getBaselineFitness(data));
+        // normalize based on bfi ranges
+        fitness = fitness.subtract(getBfiMin()).divide(getBfiMax().subtract(getBfiMin()), MathUtils.ROUNDING_MODE);
 
-        Double fitness = classifierAccuracy.subtract(penalty).doubleValue();
-
-        if (verbose) {
-            System.out.println("Classifier accuracy = " + classifierAccuracy.toString());
-            System.out.println("Penalty value = " + penalty.toString());
-            System.out.println("Fitness accuracy = " + fitness.toString());
-        }
-        fitnessCache.put(key, fitness);
-        return fitness;
+        fitnessCache.put(key, fitness.doubleValue());
+        return fitness.doubleValue();
 
     }
 

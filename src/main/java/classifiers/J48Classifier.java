@@ -1,6 +1,7 @@
 package classifiers;
 
 import utils.GlobalConstants;
+import utils.MathUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
@@ -27,8 +28,7 @@ public class J48Classifier implements IClassify {
         j48.buildClassifier(training);
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(j48, testing);
-        BigDecimal bd = new BigDecimal(eval.kappa());
-        bd = bd.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_UP);
+        BigDecimal bd = MathUtils.doubleToBigDecimal(eval.kappa());
         return bd.doubleValue();
     }
 }

@@ -2,6 +2,7 @@ package classifiers;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import utils.GlobalConstants;
+import utils.MathUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
@@ -47,8 +48,8 @@ public class NeuralNetClassifier implements IClassify {
         descriptiveStatistics.addValue(eval.kappa());
         }
 
-        BigDecimal bd = new BigDecimal(descriptiveStatistics.getMean());
-        bd = bd.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_UP);
+        BigDecimal bd = MathUtils.doubleToBigDecimal(descriptiveStatistics.getMean());
+
         return bd.doubleValue();
     }
 }

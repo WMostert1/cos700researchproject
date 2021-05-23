@@ -23,9 +23,9 @@ public class IBkClassifier implements IClassify {
         ibk.setOptions(options);
 
         //This is to make sure that NO feature included has a really bad fitness
-        if(training.classIndex() == 0 || testing.classIndex() == 0){
-            return Double.MIN_VALUE;
-        }
+//        if(training.classIndex() == 0 || testing.classIndex() == 0){
+//            throw new RuntimeException("Class index not set.");
+//        }
 
         if(training.classIndex() < 1 || testing.classIndex() < 1){
             throw new RuntimeException("Class index not set.");
@@ -36,7 +36,7 @@ public class IBkClassifier implements IClassify {
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(ibk, testing);
 
-        //return MathUtils.doubleToBigDecimal(eval.kappa()).doubleValue();
+//        return MathUtils.doubleToBigDecimal(eval.kappa()).doubleValue();
         return MathUtils.doubleToBigDecimal(eval.unweightedMicroFmeasure()).doubleValue();
     }
 

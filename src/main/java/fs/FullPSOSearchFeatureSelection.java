@@ -12,6 +12,7 @@ import utils.MathUtils;
 import weka.core.Instances;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static utils.MathUtils.doubleToBigDecimal;
@@ -21,7 +22,8 @@ public class FullPSOSearchFeatureSelection implements FeatureSelectionAlgorithm 
     @Override
     public FeatureSelectionResult apply(Instances data, FitnessEvaluator fitnessEvaluator) throws Exception {
         List<Particle> bestParticles = Lists.newArrayList();
-        for(int i = 0; i < 30; i++) {
+        for(int i = 0; i < PSO_RUNS; i++) {
+            System.out.println(Instant.now().toString() + ": Start " + getAlgorithmName() + " - (" + (i + 1) + "/" + PSO_RUNS + ")");
             GbestPSO pso = new GbestPSO(
                     new KnnParticleFitnessCalculator(fitnessEvaluator, data),
                     data.numAttributes() - 1,
@@ -33,6 +35,7 @@ public class FullPSOSearchFeatureSelection implements FeatureSelectionAlgorithm 
                     100
             );
             bestParticles.add(pso.optimize());
+            System.out.println(Instant.now().toString() + ": End " + getAlgorithmName() + " - (" + (i + 1) + "/" + PSO_RUNS + ")");
         }
 
         BigDecimal averageAccuracy = BigDecimal.ZERO;
@@ -58,6 +61,6 @@ public class FullPSOSearchFeatureSelection implements FeatureSelectionAlgorithm 
 
     @Override
     public String getAlgorithmName() {
-        return "GBest PSO";
+        return "PSO";
     }
 }

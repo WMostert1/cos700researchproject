@@ -1,23 +1,10 @@
 package fs;
 
-import com.google.common.collect.Lists;
-import fitness.FitnessEvaluator;
-import lons.examples.BinarySolution;
-import lons.examples.ConcreteBinarySolution;
-import org.checkerframework.checker.formatter.FormatUtil;
-import utils.DataSetInstanceSplitter;
-import utils.GlobalConstants;
-import weka.attributeSelection.*;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.security.SecureRandom;
 import java.util.*;
-
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
 /**
  * Created by bbdnet1339 on 2016/08/08.

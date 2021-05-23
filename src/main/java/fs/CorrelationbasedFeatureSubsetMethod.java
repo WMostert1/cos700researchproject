@@ -8,12 +8,12 @@ import weka.attributeSelection.CfsSubsetEval;
 import weka.core.Instances;
 
 import static fs.FeatureSelectorUtils.convertAttributeIndexArrayToBinarySolutionFormat;
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
+import static utils.GlobalConstants.TRAINING_PERCENTAGE;
 
 public class CorrelationbasedFeatureSubsetMethod implements FeatureSelectionAlgorithm {
     @Override
     public FeatureSelectionResult apply(Instances data, FitnessEvaluator fitnessEvaluator) throws Exception {
-        DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, PERCENTAGE_SPLIT);
+        DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, TRAINING_PERCENTAGE);
         CfsSubsetEval cfsSubsetEval = new CfsSubsetEval();
         cfsSubsetEval.setOptions(weka.core.Utils.splitOptions("weka.attributeSelection.CfsSubsetEval -P 1 -E 1"));
         cfsSubsetEval.buildEvaluator(data);
@@ -38,6 +38,6 @@ public class CorrelationbasedFeatureSubsetMethod implements FeatureSelectionAlgo
 
     @Override
     public String getAlgorithmName() {
-        return "Correlation Based Feature Subset Evaluation";
+        return "CBFS";
     }
 }

@@ -1,0 +1,460 @@
+⚠ PLEASE BE AWARE THAT THE EXECUTION LOGS AND OTHER SUBMITTED FILES WILL BE DELETED BY CANCELLING THE EXECUTION.
+
+
+
+< M A T L A B (R) >
+Copyright 1984-2018 The MathWorks, Inc.
+R2018b (9.5.0.944444) 64-bit (glnxa64)
+August 28, 2018
+
+
+To get started, type doc.
+For product information, visit www.mathworks.com.
+
+-------------------------------------------------------------------------
+
+'trainIS.m'
+
+Code by: Mario Andres Mu�oz Acosta
+School of Mathematics and Statistics
+The University of Melbourne
+Australia
+2019
+
+Copyright: Mario A. Mu�oz
+
+-------------------------------------------------------------------------
+
+If using this software, please cite as:
+
+Smith-Miles, K.; Mu�oz, M.A. et al. 'Instance Space Analysis' doi:
+
+-------------------------------------------------------------------------
+
+DISCLAIMER:
+
+THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+Root Directory: /servers/matilda-users/aeolus/feature_selection_1/
+-------------------------------------------------------------------------
+-> Listing options to be used:
+outputs
+web: 1
+csv: 1
+png: 1
+
+auto
+featsel: 1
+preproc: 1
+
+corr
+flag: 1
+threshold: 3
+
+webParams
+problemName: 'feature_selection'
+performanceMetricLabel: 'BFI'
+
+pilot
+ntries: 30
+analytic: 0
+
+bound
+flag: 0
+
+clust
+KDEFAULT: 10
+SILTHRESHOLD: 0.5000
+Replicates: 100
+flag: 1
+NTREES: 50
+MaxIter: 1000
+
+selvars
+smallscaleflag: 0
+fileidxflag: 0
+
+pythia
+ispolykrnl: 1
+useweights: 0
+uselibsvm: 1
+cvfolds: 10
+
+cloister
+pval: 0.0500
+cthres: 0.7000
+
+norm
+flag: 1
+
+general
+betaThreshold: 0.5500
+
+trace
+RHO: 10
+PI: 0.7500
+usesim: 0
+
+webproc
+flag: 1
+
+parallel
+flag: 1
+ncores: 2
+
+perf
+epsilon: 0.0500
+AbsPerf: 0
+MaxPerf: 1
+
+-------------------------------------------------------------------------
+-> Starting parallel processing pool.
+Starting parallel pool (parpool) using the 'local' profile ...
+connected to 2 workers.
+-------------------------------------------------------------------------
+-> Loading the data.
+-------------------------------------------------------------------------
+-> Calculating the binary measure of performance
+-> An algorithm is good if its performace is within 5% of the best.
+-> For 30% of the instances there is more than one best algorithm. Random selection is used to break ties.
+=========================================================================
+-> Auto-pre-processing.
+=========================================================================
+-> Auto-normalizing the data using Box-Cox and Z transformations.
+-------------------------------------------------------------------------
+-> Using the complete set of the instances.
+=========================================================================
+-> Auto-feature selection.
+=========================================================================
+-> Checking for feature correlation with performance.
+-> Keeping 5 out of 18 features (correlation).
+-> Selecting features based on correlation clustering.
+-> Average silhouette values for each number of clusters.
+3.0000 4.0000 5.0000
+0.8214 0.9997 1.0000
+
+-> Silhouette threshold is too low. Consider using a higher value.
+-> Using the minimum number of clusters possible.
+-> Constructing 3 clusters of features.
+-> 4 valid feature combinations.
+-> There are less than 1000 valid combinations. Using brute-force to find an optimal one.
+-> Combination No. 1 | Elapsed Time: 4.27s | Average error : 0.21948
+-> Combination No. 2 | Elapsed Time: 2.26s | Average error : 0.21688
+-> Combination No. 3 | Elapsed Time: 2.21s | Average error : 0.20714
+-> Combination No. 4 | Elapsed Time: 2.15s | Average error : 0.21948
+-> Keeping 3 out of 5 features (clustering).
+=========================================================================
+-> Calling PILOT to find the optimal projection.
+=========================================================================
+-------------------------------------------------------------------------
+-> PILOT is using a random starting points for BFGS.
+-------------------------------------------------------------------------
+-> PILOT is solving numerically the projection problem.
+-> This may take a while. Trials will not be run sequentially.
+-------------------------------------------------------------------------
+-> PILOT has completed trial 1
+-> PILOT has completed trial 3
+-> PILOT has completed trial 2
+-> PILOT has completed trial 9
+-> PILOT has completed trial 8
+-> PILOT has completed trial 7
+-> PILOT has completed trial 6
+-> PILOT has completed trial 5
+-> PILOT has completed trial 4
+-> PILOT has completed trial 17
+-> PILOT has completed trial 16
+-> PILOT has completed trial 15
+-> PILOT has completed trial 14
+-> PILOT has completed trial 13
+-> PILOT has completed trial 12
+-> PILOT has completed trial 11
+-> PILOT has completed trial 10
+-> PILOT has completed trial 27
+-> PILOT has completed trial 26
+-> PILOT has completed trial 25
+-> PILOT has completed trial 24
+-> PILOT has completed trial 23
+-> PILOT has completed trial 22
+-> PILOT has completed trial 21
+-> PILOT has completed trial 20
+-> PILOT has completed trial 19
+-> PILOT has completed trial 18
+-> PILOT has completed trial 30
+-> PILOT has completed trial 29
+-> PILOT has completed trial 28
+-------------------------------------------------------------------------
+-> PILOT has completed. The projection matrix A is:
+
+[] 'neutral_m1' 'hdil_skewness' 'infog_skewness'
+'Z_{1}' [ -0.5335] [ -0.5099] [ -0.1048]
+'Z_{2}' [ -0.0406] [ 0.1406] [ -0.7127]
+
+=========================================================================
+-> Finding empirical bounds using CLOISTER.
+=========================================================================
+-> CLOISTER is using correlation to estimate a boundary for the space.
+-------------------------------------------------------------------------
+-> CLOISTER has completed.
+=========================================================================
+-> Summoning PYTHIA to train the prediction models.
+=========================================================================
+-> Initializing PYTHIA.
+-------------------------------------------------------------------------
+-> PYTHIA is using a polynomial kernel
+-------------------------------------------------------------------------
+-> Using LIBSVM's libraries.
+-> Search on a latin hyper-cube design will be used for parameter hyper-tunning.
+-------------------------------------------------------------------------
+-> Using a 10-fold stratified cross-validation experiment to evaluate the SVMs.
+-------------------------------------------------------------------------
+-> Training has started. PYTHIA may take a while to complete...
+-> PYTHIA has trained a model for 'AMSO', there are 6 models left to train.
+-> Elapsed time: 16.16s
+-> PYTHIA has trained a model for 'GA', there are 5 models left to train.
+-> Elapsed time: 33.25s
+-> PYTHIA has trained a model for 'EDA', there are 4 models left to train.
+-> Elapsed time: 17.24s
+-> PYTHIA has trained a model for 'SFS', there are 3 models left to train.
+-> Elapsed time: 9.51s
+-> PYTHIA has trained a model for 'PCR', there are 2 models left to train.
+-> Elapsed time: 49.34s
+-> PYTHIA has trained a model for 'IGFS', there is 1 model left to train.
+-> Elapsed time: 44.65s
+-> PYTHIA has trained a model for 'REL', there are no models left to train.
+-> Elapsed time: 52.39s
+-------------------------------------------------------------------------
+-> PYTHIA has completed training the models.
+-> The average cross validated precision is: 84.6%
+-> The average cross validated accuracy is: 68.6%
+-> Elapsed time: 222.54s
+-------------------------------------------------------------------------
+-> PYTHIA is preparing the summary table.
+-> PYTHIA has completed! Performance of the models:
+
+Columns 1 through 3
+
+'Algorithms ' 'Avg_Perf_all_ins...' 'Std_Perf_all_ins...'
+'AMSO' [ 0.5640] [ 0.0620]
+'GA' [ 0.5640] [ 0.0510]
+'EDA' [ 0.5600] [ 0.0500]
+'SFS' [ 0.5660] [ 0.0650]
+'PCR' [ 0.5510] [ 0.0540]
+'IGFS' [ 0.5510] [ 0.0540]
+'REL' [ 0.5520] [ 0.0570]
+'Oracle' [ 0.5750] [ 0.0620]
+'Selector' [ 0.5680] [ 0.0580]
+
+Columns 4 through 6
+
+'Probability_of_good' 'Avg_Perf_selecte...' 'Std_Perf_selecte...'
+[ 0.9050] [ 0.5580] [ 0.0590]
+[ 0.8770] [ 0.5550] [ 0.0510]
+[ 0.8500] [ 0.5600] [ 0.0500]
+[ 0.9140] [ 0.5470] [ 0.0550]
+[ 0.7090] [ 0.5510] [ 0.0540]
+[ 0.7230] [ 0.5320] [ 0.0380]
+[ 0.7320] [ 0.5190] [ 0.0350]
+[ 1] [] []
+[ 0.9590] [ 0.5680] [ 0.0580]
+
+Columns 7 through 9
+
+'CV_model_accuracy' 'CV_model_precision' 'CV_model_recall'
+[ 85] [ 92.3000] [ 91]
+[ 90] [ 96.2000] [ 92.2000]
+[ 85] [ 85] [ 100]
+[ 60.9000] [ 93.2000] [ 61.7000]
+[ 70.9000] [ 70.9000] [ 100]
+[ 46.8000] [ 75.6000] [ 39]
+[ 41.4000] [ 78.6000] [ 27.3000]
+[] [] []
+[] [ 95.9000] [ 49.1000]
+
+Columns 10 through 11
+
+'BoxConstraint' 'KernelScale'
+[ 0.2170] [ 0.3600]
+[ 0.4240] [ 14.3470]
+[ 0.0660] [ 0.0650]
+[ 2.7910] [ 2.1540]
+[ 0.0660] [ 0.0650]
+[ 0.1640] [ 7.9810]
+[ 0.1640] [ 7.9810]
+[] []
+[] []
+
+=========================================================================
+-> Calling TRACE to perform the footprint analysis.
+=========================================================================
+-> TRACE will use experimental data to calculate the footprints.
+-> TRACE is calculating the space area and density.
+-> Space area: 6.0597 | Space density: 33.5
+-------------------------------------------------------------------------
+-> TRACE is calculating the algorithm footprints.
+-> Good performance footprint for 'AMSO'
+-> Best performance footprint for 'AMSO'
+-> Algorithm 'AMSO' completed. Elapsed time: 0.36s
+-> Good performance footprint for 'EDA'
+-> Best performance footprint for 'EDA'
+-> Algorithm 'EDA' completed. Elapsed time: 0.39s
+-> Good performance footprint for 'GA'
+-> Best performance footprint for 'GA'
+-> Algorithm 'GA' completed. Elapsed time: 0.11s
+-> Good performance footprint for 'PCR'
+-> Best performance footprint for 'PCR'
+-> Algorithm 'PCR' completed. Elapsed time: 0.09s
+-> Good performance footprint for 'SFS'
+-> Best performance footprint for 'SFS'
+-> Algorithm 'SFS' completed. Elapsed time: 0.12s
+-> Good performance footprint for 'IGFS'
+-> Best performance footprint for 'IGFS'
+-> Algorithm 'IGFS' completed. Elapsed time: 0.07s
+-> Good performance footprint for 'REL'
+-> Best performance footprint for 'REL'
+-> Algorithm 'REL' completed. Elapsed time: 0.05s
+-------------------------------------------------------------------------
+-> TRACE is detecting and removing contradictory sections of the footprints.
+-> Base algorithm 'AMSO'
+-> TRACE is comparing 'AMSO' with 'GA'
+-> Test algorithm 'GA' completed. Elapsed time: 0.03s
+-> TRACE is comparing 'AMSO' with 'EDA'
+-> Test algorithm 'EDA' completed. Elapsed time: 0.02s
+-> TRACE is comparing 'AMSO' with 'SFS'
+-> Test algorithm 'SFS' completed. Elapsed time: 0.01s
+-> TRACE is comparing 'AMSO' with 'PCR'
+-> Test algorithm 'PCR' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'AMSO' with 'IGFS'
+-> Test algorithm 'IGFS' completed. Elapsed time: 0.02s
+-> TRACE is comparing 'AMSO' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'AMSO' completed. Elapsed time: 0.09s
+-> Base algorithm 'GA'
+-> TRACE is comparing 'GA' with 'EDA'
+-> Purity of the contradicting areas is equal for both footprints.
+-> Ignoring the contradicting area.
+-> Test algorithm 'EDA' completed. Elapsed time: 0.01s
+-> TRACE is comparing 'GA' with 'SFS'
+-> 2.8% of the base footprint is contradictory.
+-> Test algorithm 'SFS' completed. Elapsed time: 0.10s
+-> TRACE is comparing 'GA' with 'PCR'
+-> Test algorithm 'PCR' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'GA' with 'IGFS'
+-> 2.9% of the test footprint is contradictory.
+-> 2.9% of the test footprint is contradictory.
+-> 2.9% of the test footprint is contradictory.
+-> Test algorithm 'IGFS' completed. Elapsed time: 0.06s
+-> TRACE is comparing 'GA' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'GA' completed. Elapsed time: 0.17s
+-> Base algorithm 'EDA'
+-> TRACE is comparing 'EDA' with 'SFS'
+-> 3.9% of the test footprint is contradictory.
+-> Test algorithm 'SFS' completed. Elapsed time: 0.04s
+-> TRACE is comparing 'EDA' with 'PCR'
+-> Test algorithm 'PCR' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'EDA' with 'IGFS'
+-> Purity of the contradicting areas is equal for both footprints.
+-> Ignoring the contradicting area.
+-> Test algorithm 'IGFS' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'EDA' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'EDA' completed. Elapsed time: 0.04s
+-> Base algorithm 'SFS'
+-> TRACE is comparing 'SFS' with 'PCR'
+-> Test algorithm 'PCR' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'SFS' with 'IGFS'
+-> Test algorithm 'IGFS' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'SFS' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'SFS' completed. Elapsed time: 0.01s
+-> Base algorithm 'PCR'
+-> TRACE is comparing 'PCR' with 'IGFS'
+-> Test algorithm 'IGFS' completed. Elapsed time: 0.00s
+-> TRACE is comparing 'PCR' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'PCR' completed. Elapsed time: 0.00s
+-> Base algorithm 'IGFS'
+-> TRACE is comparing 'IGFS' with 'REL'
+-> Test algorithm 'REL' completed. Elapsed time: 0.00s
+-> Base algorithm 'IGFS' completed. Elapsed time: 0.00s
+-> Base algorithm 'REL'
+-> Base algorithm 'REL' completed. Elapsed time: 0.00s
+-------------------------------------------------------------------------
+-> TRACE is calculating the beta-footprint.
+-------------------------------------------------------------------------
+-> TRACE is preparing the summary table.
+-> TRACE has completed. Footprint analysis results:
+
+Columns 1 through 4
+
+[] 'Area_Good' 'Area_Good_Normal...' 'Density_Good'
+'AMSO' [ 6.0810] [ 1.0040] [ 32.8870]
+'GA' [ 5.6150] [ 0.9270] [ 32.4120]
+'EDA' [ 5.7850] [ 0.9550] [ 29.3860]
+'SFS' [ 5.9670] [ 0.9850] [ 33.8540]
+'PCR' [ 4.4530] [ 0.7350] [ 33.4570]
+'IGFS' [ 2.9830] [ 0.4920] [ 36.2050]
+'REL' [ 4.4160] [ 0.7290] [ 32.1550]
+
+Columns 5 through 7
+
+'Density_Good_Nor...' 'Purity_Good' 'Area_Best'
+[ 0.9820] [ 0.9250] [ 0]
+[ 0.9680] [ 0.9670] [ 0.3260]
+[ 0.8770] [ 0.9350] [ 0.2100]
+[ 1.0110] [ 0.9160] [ 0.5150]
+[ 0.9990] [ 0.7850] [ 0]
+[ 1.0810] [ 0.8520] [ 0.2840]
+[ 0.9600] [ 0.8590] [ 0.0450]
+
+Columns 8 through 10
+
+'Area_Best_Normal...' 'Density_Best' 'Density_Best_Nor...'
+[ 0] [ 0] [ 0]
+[ 0.0540] [ 33.7140] [ 1.0060]
+[ 0.0350] [ 33.3540] [ 0.9960]
+[ 0.0850] [ 40.8070] [ 1.2180]
+[ 0] [ 0] [ 0]
+[ 0.0470] [ 24.6370] [ 0.7350]
+[ 0.0070] [ 66.9280] [ 1.9980]
+
+Column 11
+
+'Purity_Best'
+[ 0]
+[ 0.9090]
+[ 0.8570]
+[ 0.9050]
+[ 0]
+[ 0.8570]
+[ 1]
+
+-------------------------------------------------------------------------
+-> Closing parallel processing pool.
+Parallel pool using the 'local' profile is shutting down.
+=========================================================================
+-> Writing the data on CSV files for posterior analysis.
+=========================================================================
+-> Writing the data for the web interfase.
+=========================================================================
+-> Producing the plots.
+-------------------------------------------------------------------------
+-> Storing the raw MATLAB results for post-processing and/or debugging.
+-> Completed! Elapsed time: 287.0974s

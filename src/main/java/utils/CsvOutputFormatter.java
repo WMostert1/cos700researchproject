@@ -6,7 +6,9 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 public class CsvOutputFormatter extends OutputFormatter {
+
     //This is for Excel
+    private static final String DELIMITER = ",";
 
     public CsvOutputFormatter(final String fileName, String... headers) {
         super(fileName, headers);
@@ -34,11 +36,12 @@ public class CsvOutputFormatter extends OutputFormatter {
 //            throw new RuntimeException("Recording more columns than number of rows!");
 //        }
 
-        for (final String val : vals) {
-            if(val == null){
-                append("null;");
-            }else {
-                append(val.replace(".", ",") + ";");
+        for (int i = 0; i < vals.length; i++) {
+            String val = vals[i];
+            if (val == null) {
+                append("null" + DELIMITER);
+            } else {
+                append(val.replace(".", ".") + (i < vals.length - 1 ? DELIMITER : ""));
             }
         }
 

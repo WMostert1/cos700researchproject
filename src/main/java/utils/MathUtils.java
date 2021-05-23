@@ -1,6 +1,7 @@
 package utils;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
@@ -8,11 +9,11 @@ import static utils.GlobalConstants.REPORTED_DECIMAL_PLACES;
 
 public class MathUtils {
 
-    public static RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
+    public static MathContext ROUNDING_MODE = MathContext.DECIMAL32;
 
     public static BigDecimal doubleToBigDecimal(Double value){
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(GlobalConstants.DECIMAL_PLACES, ROUNDING_MODE);
+        bd = bd.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_EVEN);
         return bd;
     }
 

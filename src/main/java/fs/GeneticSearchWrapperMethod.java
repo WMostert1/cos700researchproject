@@ -2,7 +2,6 @@ package fs;
 
 import com.google.common.collect.Lists;
 import fitness.FitnessEvaluator;
-import lons.examples.BinarySolution;
 import lons.examples.ConcreteBinarySolution;
 import utils.DataSetInstanceSplitter;
 import utils.GlobalConstants;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static fs.FeatureSelectorUtils.convertAttributeIndexArrayToBinarySolutionFormat;
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
+import static utils.GlobalConstants.TRAINING_PERCENTAGE;
 
 public class GeneticSearchWrapperMethod extends StochasticFeatureSelection implements FeatureSelectionAlgorithm {
     private final int GA_RUNS;
@@ -38,7 +37,7 @@ public class GeneticSearchWrapperMethod extends StochasticFeatureSelection imple
             List<FeatureSelectionResult> bundles = Lists.newArrayList();
             FeatureSelectionResult bestBundle = null;
 
-            DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, PERCENTAGE_SPLIT);
+            DataSetInstanceSplitter splitter = new DataSetInstanceSplitter(data, TRAINING_PERCENTAGE);
 
             WrapperSplitSetsEvalutator wrapper = new WrapperSplitSetsEvalutator(fitnessEvaluator);
             wrapper.buildEvaluator(data);
@@ -83,12 +82,12 @@ public class GeneticSearchWrapperMethod extends StochasticFeatureSelection imple
 
             meanAccuracy /= GA_RUNS;
 
-            BigDecimal bdMeanAccuracy = new BigDecimal(meanAccuracy);
-            bdMeanAccuracy = bdMeanAccuracy.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_UP);
+
+//            bdMeanAccuracy = bdMeanAccuracy.setScale(GlobalConstants.DECIMAL_PLACES, MathUtils.ROUNDING_MODE);
 
 //            BigDecimal bdSuccessRatio = new BigDecimal(successCount/(double)GA_RUNS);
 //            bdSuccessRatio = bdSuccessRatio.setScale(GlobalConstants.DECIMAL_PLACES, RoundingMode.HALF_UP);
-            bestBundle.setAccuracy(bdMeanAccuracy.doubleValue());
+            bestBundle.setAccuracy(MathUtils.doubleToBigDecimal(meanAccuracy).doubleValue());
             return bestBundle;
             //return new GAResult(bestBundle, bdMeanAccuracy.doubleValue(), bdSuccessRatio.doubleValue());
 

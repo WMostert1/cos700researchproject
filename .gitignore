@@ -44,3 +44,6 @@ hs_err_pid*
 
 .idea/
 *.iml
+
+src/main/resources/data-sets/open-ml/
+StatisticalTests/openml_datasets/

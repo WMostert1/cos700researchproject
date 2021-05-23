@@ -3,11 +3,7 @@ package fs;
 import fitness.FitnessEvaluator;
 
 
-import utils.DataSetInstanceSplitter;
-import weka.attributeSelection.CorrelationAttributeEval;
 import weka.core.Instances;
-
-import static utils.GlobalConstants.PERCENTAGE_SPLIT;
 
 public class SemetricUncertaintyRankerMethod extends GenericRankerFeatureSelection implements FeatureSelectionAlgorithm {
     @Override

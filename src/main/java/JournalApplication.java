@@ -277,8 +277,8 @@ public class JournalApplication {
 //                outF.addAsColumns("Number of features", Integer.toString(originalData.numAttributes() - 1));
 //
 //                System.out.println("Calculating neutrality...");
-//                Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
-//                outNeutrality.addAsColumns(dataSet, neatraility.getFirst().toString(), neatraility.getSecond().toString());
+                Pair<BigDecimal, BigDecimal> neatraility = neutralityMeasure.get(fitnessEvaluator, originalData);
+                outNeutrality.addAsColumns(dataSet, neatraility.getFirst().toString(), neatraility.getSecond().toString());
 //
 //                System.out.println("Calculating fitness distribution...");
 //                FitnessDistributionMeasure fitnessDistributionMeasure = new FitnessDistributionMeasure(20, -1.0, 1.0, 20);
