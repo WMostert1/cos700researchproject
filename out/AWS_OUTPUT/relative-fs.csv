@@ -1,0 +1,14 @@
+Dataset;Feature Selection Algorithm;Baseline;Relative Fitness;
+arcene,arff;Random;0,55;0,20074297;
+arcene,arff;Sequential Forward Selection;0,55;0,38994878;
+arcene,arff;GA;0,55;0,31812499;
+arcene,arff;Pearson Correlation Ranker;0,55;0,2550937;
+arcene,arff;Info Gain Ranker;0,55;0,29899723;
+arcene,arff;AMSO;0,55;0,31056493;
+Hill_Valley_sample,arff;Random;0,28465347;0,20140939;
+Hill_Valley_sample,arff;Info Gain Ranker;0,28465347;0,25922785;
+Hill_Valley_sample,arff;Pearson Correlation Ranker;0,28465347;0,26096719;
+Hill_Valley_sample,arff;Sequential Forward Selection;0,28465347;0,31588126;
+Hill_Valley_sample,arff;Sequential Backward Selection;0,28465347;0,21218153;
+Hill_Valley_sample,arff;AMSO;0,28465347;0,28406959;
+Hill_Valley_sample,arff;GA;0,28465347;0,3137636;
